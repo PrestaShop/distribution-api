@@ -11,6 +11,8 @@ use ZipArchive;
 
 class ModuleUtils
 {
+    private const PS_VERSION = '_PS_VERSION_';
+
     private ModuleParser $parser;
     private Client $client;
     private GithubClient $githubClient;
@@ -124,8 +126,8 @@ class ModuleUtils
 
         return [
             'version' => $info['version'],
-            'versionCompliancyMin' => $info['versionCompliancyMin'],
-            'versionCompliancyMax' => $info['versionCompliancyMax'],
+            'versionCompliancyMin' => $info['versionCompliancyMin'] === self::PS_VERSION ? null : $info['versionCompliancyMin'],
+            'versionCompliancyMax' => $info['versionCompliancyMax'] === self::PS_VERSION ? null : $info['versionCompliancyMax'],
         ];
     }
 
