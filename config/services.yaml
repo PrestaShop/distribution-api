@@ -24,3 +24,6 @@ services:
 
   App\Command\CleanCommand:
     tags: ['console.command']
+
+  App\Command\CheckReposCommand:
+    tags: [ 'console.command' ]

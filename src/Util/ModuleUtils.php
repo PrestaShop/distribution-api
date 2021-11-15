@@ -37,9 +37,9 @@ class ModuleUtils
     }
 
     /**
-     * @return array<array<string, string>>
+     * @return array<array<string, string|null>>
      */
-    public function getVersions(string $moduleName): array
+    public function getVersions(string $moduleName, bool $withAssetOnly = true): array
     {
         $page = 1;
         $versions = [];
@@ -47,21 +47,25 @@ class ModuleUtils
         while (count($results = $releasesApi->all('PrestaShop', $moduleName, ['page' => $page++])) > 0) {
             $versions = array_merge(
                 $versions,
-                array_filter($results, fn ($item) => !empty($item['assets'] && !$item['draft']))
+                array_filter($results, fn ($item) => (!empty($item['assets'] || !$withAssetOnly) && !$item['draft']))
             );
         }
 
         return array_map(fn ($item) => [
             'version' => $item['tag_name'],
-            'url' => current($item['assets'])['browser_download_url'],
+            'url' => !empty($item['assets']) ? current($item['assets'])['browser_download_url'] : null,
         ], $versions);
     }
 
     /**
-     * @param array<string, string> $version
+     * @param array<string, string|null> $version
      */
     public function download(string $module, array $version): void
     {
+        if ($version['url'] === null) {
+            return;
+        }
+
         $path = join('/', [$this->moduleDir, $module, $version['version']]);
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
@@ -123,5 +127,17 @@ class ModuleUtils
             'versionCompliancyMin' => $info['versionCompliancyMin'],
             'versionCompliancyMax' => $info['versionCompliancyMax'],
         ];
+    }
+
+    /**
+     * @return array<string>
+     */
+    public function getNativeModuleList(): array
+    {
+        $tree = $this->githubClient->git()->trees()->show('PrestaShop', 'PrestaShop-modules', 'master');
+
+        $modules = array_filter($tree['tree'], fn ($item) => $item['type'] === 'commit');
+
+        return array_map(fn ($item) => $item['path'], $modules);
     }
 }
