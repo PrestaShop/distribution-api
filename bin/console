@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+$containerBuilder = new ContainerBuilder();
+$loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../config/'));
+$loader->load('services.yaml');
+$containerBuilder->compile();
+
+$commands = $containerBuilder->findTaggedServiceIds('console.command');
+$commands = array_map(fn($item) => $containerBuilder->get($item), array_keys($commands));
+
+$application = new Application();
+$application->addCommands($commands);
+$application->run();

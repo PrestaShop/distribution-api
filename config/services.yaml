@@ -1,0 +1,26 @@
+imports:
+  - { resource: parameters.yaml }
+
+services:
+  _defaults:
+    public: true
+    autowire: true
+
+  Github\Client:
+    calls:
+      - authenticate: ['%github_token%', 'access_token_header']
+
+  GuzzleHttp\Client:
+
+  Psssst\ModuleParser:
+
+  App\Util\ModuleUtils:
+
+  App\Command\GenerateJsonCommand:
+    tags: ['console.command']
+
+  App\Command\DownloadNativeModulesCommand:
+    tags: ['console.command']
+
+  App\Command\CleanCommand:
+    tags: ['console.command']
