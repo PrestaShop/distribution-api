@@ -1,6 +1,8 @@
 {
     "name": "prestashop/prestashop-api",
     "type": "project",
+    "description": "Generates PrestaShop Open-Source API endpoints",
+    "license": "MIT",
     "require": {
         "php": "^8.0",
         "ext-zip": "*",
