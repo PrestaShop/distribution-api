@@ -24,7 +24,7 @@ class DownloadNativeModulesCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $modules = $this->moduleUtils->getNativeModuleList();
-        $output->writeln(sprintf('<info>%s modules found</info>', count($modules)));
+        $output->writeln(sprintf('<info>%d modules found</info>', count($modules)));
 
         foreach ($modules as $module) {
             $versions = $this->moduleUtils->getVersions($module);

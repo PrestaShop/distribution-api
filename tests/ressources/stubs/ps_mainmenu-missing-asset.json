@@ -1,0 +1,14 @@
+[
+  {
+    "version": "1.0.0",
+    "url": "https://fake.url"
+  },
+  {
+    "version": "1.1.0",
+    "url": null
+  },
+  {
+    "version": "1.2.0",
+    "url": "https://fake.url"
+  }
+]

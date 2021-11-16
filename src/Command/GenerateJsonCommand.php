@@ -60,7 +60,7 @@ class GenerateJsonCommand extends Command
     /**
      * @return array<string>
      */
-    private function getPrestaShopVersions(): array
+    protected function getPrestaShopVersions(): array
     {
         $page = 1;
         $versions = [];

@@ -1,9 +1,15 @@
 vendor/
 public/json/*
 !public/json/.gitkeep
+
 public/modules/*
 !public/modules/.gitkeep
+
 var/tmp/*
 !var/tmp/.gitkeep
+
+tests/output/*
+!tests/output/.gitkeep
+
 .php-cs-fixer.cache
 config/parameters.yaml
