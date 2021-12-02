@@ -31,7 +31,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
                 __DIR__ . '/../ressources/modules',
                 __DIR__ . '/../../var/tmp',
             ])
-            ->onlyMethods(['download', 'getLocalModules'])
+            ->onlyMethods(['downloadMainClass', 'getLocalModules'])
             ->getMock()
         ;
         $moduleUtils->method('getLocalModules')->willReturn([
@@ -86,50 +86,6 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
         $this->assertJsonFileEqualsJsonFile(
             $baseExpected . '/1.7.8.1/modules.json',
             $baseOutput . '/1.7.8.1/modules.json'
-        );
-
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.6.1.4.json',
-            $baseOutput . '/autoupgrade/1.6.1.4.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.6.1.24.json',
-            $baseOutput . '/autoupgrade/1.6.1.24.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.7.0.0.json',
-            $baseOutput . '/autoupgrade/1.7.0.0.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.7.7.8.json',
-            $baseOutput . '/autoupgrade/1.7.7.8.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.7.8.1.json',
-            $baseOutput . '/autoupgrade/1.7.8.1.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/latest.json',
-            $baseOutput . '/autoupgrade/latest.json'
-        );
-
-        $this->assertFileDoesNotExist($baseOutput . '/psgdpr/1.6.1.4.json');
-        $this->assertFileDoesNotExist($baseOutput . '/psgdpr/1.6.1.24.json');
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/1.7.0.0.json',
-            $baseOutput . '/psgdpr/1.7.0.0.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/1.7.7.8.json',
-            $baseOutput . '/psgdpr/1.7.7.8.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/1.7.8.1.json',
-            $baseOutput . '/psgdpr/1.7.8.1.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/latest.json',
-            $baseOutput . '/psgdpr/latest.json'
         );
     }
 }

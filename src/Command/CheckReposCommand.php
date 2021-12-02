@@ -39,9 +39,9 @@ class CheckReposCommand extends Command
             $output->writeln(sprintf('<error>No release for module %s</error>', $moduleName));
         }
         foreach ($versions as $version) {
-            if ($version->getUrl() === null) {
+            if ($version->getUrl() == null) {
                 $output->writeln(
-                    sprintf('<error>No asset for release %s of module %s</error>', $version->getVersion(), $moduleName)
+                    sprintf('<error>No asset for release %s of module %s</error>', $version->getTag(), $moduleName)
                 );
             }
         }

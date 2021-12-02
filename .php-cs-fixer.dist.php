@@ -1,7 +1,7 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude(['vendor', 'var'])
+    ->exclude(['vendor', 'var', 'tests/ressources/modules'])
     ->in(__DIR__)
 ;
 

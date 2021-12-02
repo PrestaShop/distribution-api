@@ -35,7 +35,7 @@ class GenerateJsonCommand extends Command
         $modules = $this->moduleUtils->getLocalModules();
         foreach ($modules as $module) {
             foreach ($module->getVersions() as $version) {
-                $output->writeln(sprintf('<info>Parsing module %s %s</info>', $module->getName(), $version->getVersion()));
+                $output->writeln(sprintf('<info>Parsing module %s %s</info>', $module->getName(), $version->getTag()));
                 $this->moduleUtils->setVersionCompliancy($module->getName(), $version);
             }
         }
@@ -49,7 +49,6 @@ class GenerateJsonCommand extends Command
         }
 
         $output->writeln('<info>Generating main modules.json</info>');
-        $this->generateModulesJson($modules);
         $this->generatePrestaShopModulesJson($modules, $prestashopVersions, $output);
 
         return static::SUCCESS;
@@ -72,14 +71,6 @@ class GenerateJsonCommand extends Command
 
     /**
      * @param Module[] $modules
-     */
-    private function generateModulesJson(array $modules): void
-    {
-        file_put_contents($this->jsonDir . '/modules.json', json_encode($modules));
-    }
-
-    /**
-     * @param Module[] $modules
      * @param non-empty-array<string> $prestashopVersions
      */
     private function generatePrestaShopModulesJson(
@@ -92,7 +83,7 @@ class GenerateJsonCommand extends Command
             $infos[$prestashopVersion] = [];
             foreach ($modules as $module) {
                 foreach ($module->getVersions() as $version) {
-                    if (null === $version->getVersionCompliancyMin()) {
+                    if (null === $version->getVersionCompliancyMin() || null === $version->getVersion()) {
                         continue;
                     }
                     if (
@@ -108,43 +99,13 @@ class GenerateJsonCommand extends Command
             }
         }
 
-        $latestPrestashopVersion = $this->getLatestPrestashopVersion($prestashopVersions);
-        $output->writeln(sprintf('<info>Latest version of PrestaShop is version %s</info>', $latestPrestashopVersion));
-
         foreach ($infos as $prestashopVersion => $modules) {
             $output->writeln(sprintf('<info>Generate json for PrestaShop %s</info>', $prestashopVersion));
             $prestashopVersionPath = $this->jsonDir . '/' . $prestashopVersion;
             if (!is_dir($prestashopVersionPath)) {
                 mkdir($prestashopVersionPath);
             }
-
-            foreach ($modules as $name => $module) {
-                $basePath = $this->jsonDir . '/' . $name;
-                if (!is_dir($basePath)) {
-                    mkdir($basePath);
-                }
-                file_put_contents($basePath . '/' . $prestashopVersion . '.json', json_encode($module));
-                if ($prestashopVersion === $latestPrestashopVersion) {
-                    file_put_contents($basePath . '/latest.json', json_encode($module));
-                }
-            }
-
             file_put_contents($prestashopVersionPath . '/modules.json', json_encode($modules));
         }
-    }
-
-    /**
-     * @param non-empty-array<string> $prestashopVersions
-     */
-    private function getLatestPrestashopVersion(array $prestashopVersions): string
-    {
-        $latest = null;
-        foreach ($prestashopVersions as $prestashopVersion) {
-            if ($latest === null || version_compare($prestashopVersion, $latest, '>')) {
-                $latest = $prestashopVersion;
-            }
-        }
-
-        return $latest;
     }
 }

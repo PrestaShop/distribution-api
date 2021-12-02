@@ -1,5 +1,10 @@
 parameters:
-	level: 9
-	paths:
-		- bin
-		- src
+    level: 9
+    paths:
+        - bin
+        - src
+    ignoreErrors:
+        -
+            message: '/Parameter #2 \$version2 of function version_compare expects string, string\|null given/'
+            path: src/Command/GenerateJsonCommand.php
+            count: 1

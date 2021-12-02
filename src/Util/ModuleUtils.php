@@ -9,30 +9,27 @@ use App\Model\Version;
 use Github\Client as GithubClient;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
-use ZipArchive;
 
 class ModuleUtils
 {
     private const PS_VERSION = '_PS_VERSION_';
+    private const GITHUB_MAIN_CLASS_ENDPOINT = 'https://raw.githubusercontent.com/PrestaShop/%s/%s/%s.php';
 
     private ModuleParser $parser;
     private Client $client;
     private GithubClient $githubClient;
     private string $moduleDir;
-    private string $tmpDir;
 
     public function __construct(
         ModuleParser $moduleParser,
         Client $client,
         GithubClient $githubClient,
-        string $moduleDir = __DIR__ . '/../../public/modules',
-        string $tmpDir = __DIR__ . '/../../var/tmp'
+        string $moduleDir = __DIR__ . '/../../var/tmp',
     ) {
         $this->parser = $moduleParser;
         $this->client = $client;
         $this->githubClient = $githubClient;
         $this->moduleDir = $moduleDir;
-        $this->tmpDir = $tmpDir;
     }
 
     public function getModuleDir(): string
@@ -61,19 +58,15 @@ class ModuleUtils
         ), $versions);
     }
 
-    public function download(string $moduleName, Version $version): void
+    public function downloadMainClass(string $moduleName, Version $version): void
     {
-        if ($version->getUrl() === null) {
-            return;
-        }
-
-        $path = join('/', [$this->moduleDir, $moduleName, $version->getVersion()]);
+        $path = join('/', [$this->moduleDir, $moduleName, $version->getTag()]);
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
         }
 
-        $response = $this->client->get($version->getUrl());
-        file_put_contents($path . '/' . $moduleName . '.zip', $response->getBody());
+        $response = $this->client->get(sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName));
+        file_put_contents($path . '/' . $moduleName . '.php', $response->getBody());
     }
 
     /**
@@ -108,19 +101,11 @@ class ModuleUtils
 
     public function setVersionCompliancy(string $moduleName, Version $version): void
     {
-        $filename = join('/', [$this->moduleDir, $moduleName, $version->getVersion(), $moduleName . '.zip']);
+        $versionDir = join('/', [$this->moduleDir, $moduleName, $version->getTag()]);
 
-        if (!is_dir($this->tmpDir)) {
-            mkdir($this->tmpDir, 0777, true);
-        }
+        $info = current($this->parser->parseModule($versionDir));
 
-        $zip = new ZipArchive();
-        $zip->open($filename);
-        $zip->extractTo($this->tmpDir);
-        $zip->close();
-
-        $info = current($this->parser->parseModule($this->tmpDir . '/' . $moduleName));
-
+        $version->setVersion($info['version']);
         $version->setVersionCompliancyMin($info['versionCompliancyMin'] === self::PS_VERSION ? null : $info['versionCompliancyMin']);
         $version->setVersionCompliancyMax($info['versionCompliancyMax'] === self::PS_VERSION ? null : $info['versionCompliancyMax']);
     }

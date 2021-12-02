@@ -8,27 +8,36 @@ use JsonSerializable;
 
 class Version implements JsonSerializable
 {
-    private string $version;
+    private string $tag;
     private ?string $url;
+    private ?string $version;
     private ?string $versionCompliancyMin;
     private ?string $versionCompliancyMax;
 
-    public function __construct(string $version, ?string $url = null)
+    public function __construct(string $tag, string $url = null)
     {
-        $pattern = '/[^\d]*?(\d.+)/'; // remove version prefix like the "v" in v1.0.0
-        $replace = '$1';
-        $this->version = preg_replace($pattern, $replace, $version) ?? $version;
+        $this->tag = $tag;
         $this->url = $url;
     }
 
-    public function getVersion(): string
+    public function getTag(): ?string
     {
-        return $this->version;
+        return $this->tag;
     }
 
     public function getUrl(): ?string
     {
         return $this->url;
+    }
+
+    public function getVersion(): ?string
+    {
+        return $this->version;
+    }
+
+    public function setVersion(?string $version): void
+    {
+        $this->version = $version;
     }
 
     public function getVersionCompliancyMin(): ?string

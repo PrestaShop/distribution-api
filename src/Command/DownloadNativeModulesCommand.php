@@ -29,8 +29,8 @@ class DownloadNativeModulesCommand extends Command
         foreach ($modules as $module) {
             $versions = $this->moduleUtils->getVersions($module);
             foreach ($versions as $version) {
-                $output->writeln(sprintf('<info>Downloading %s %s</info>', $module, $version->getVersion()));
-                $this->moduleUtils->download($module, $version);
+                $output->writeln(sprintf('<info>Downloading %s %s</info>', $module, $version->getTag()));
+                $this->moduleUtils->downloadMainClass($module, $version);
             }
         }
 
