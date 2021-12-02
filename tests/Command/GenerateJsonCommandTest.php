@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Command;
 
 use App\Command\GenerateJsonCommand;
+use App\Model\Module;
+use App\Model\Version;
 use App\Util\ModuleUtils;
 use Github\Client as GithubClient;
 use GuzzleHttp\Client;
@@ -29,12 +31,20 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
                 __DIR__ . '/../ressources/modules',
                 __DIR__ . '/../../var/tmp',
             ])
-            ->onlyMethods(['download', 'getModules'])
+            ->onlyMethods(['download', 'getLocalModules'])
             ->getMock()
         ;
-        $moduleUtils->method('getModules')->willReturn([
-            'autoupgrade' => ['v4.10.1', 'v4.11.0', 'v4.12.0'],
-            'psgdpr' => ['v1.2.0', 'v1.2.1', 'v1.3.0'],
+        $moduleUtils->method('getLocalModules')->willReturn([
+            new Module('autoupgrade', [
+                new Version('v4.10.1'),
+                new Version('v4.11.0'),
+                new Version('v4.12.0'),
+            ]),
+            new Module('psgdpr', [
+                new Version('v1.2.0'),
+                new Version('v1.2.1'),
+                new Version('v1.3.0'),
+            ]),
         ]);
 
         $this->command = $this->getMockBuilder(GenerateJsonCommand::class)

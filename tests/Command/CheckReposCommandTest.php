@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Command;
 
 use App\Command\CheckReposCommand;
+use App\Model\Version;
 use App\Util\ModuleUtils;
 
 class CheckReposCommandTest extends AbstractCommandTestCase
@@ -24,10 +25,10 @@ class CheckReposCommandTest extends AbstractCommandTestCase
     {
         $this->moduleUtils->method('getVersions')
             ->willReturn(
-                json_decode(
+                array_map(fn ($item) => new Version($item['version'], $item['url']), json_decode(
                     file_get_contents(__DIR__ . '/../ressources/stubs/ps_mainmenu-no-asset.json'),
                     true
-                )
+                ))
             );
 
         $this->output
@@ -45,10 +46,10 @@ class CheckReposCommandTest extends AbstractCommandTestCase
     {
         $this->moduleUtils->method('getVersions')
             ->willReturn(
-                json_decode(
+                array_map(fn ($item) => new Version($item['version'], $item['url']), json_decode(
                     file_get_contents(__DIR__ . '/../ressources/stubs/ps_mainmenu-missing-asset.json'),
                     true
-                )
+                ))
             );
 
         $this->output
@@ -66,10 +67,10 @@ class CheckReposCommandTest extends AbstractCommandTestCase
     {
         $this->moduleUtils->method('getVersions')
             ->willReturn(
-                json_decode(
+                array_map(fn ($item) => new Version($item['version'], $item['url']), json_decode(
                     file_get_contents(__DIR__ . '/../ressources/stubs/ps_mainmenu-ok.json'),
                     true
-                )
+                ))
             );
 
         $this->output

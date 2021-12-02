@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Util;
 
+use App\Model\Module;
+use App\Model\Version;
 use Github\Client as GithubClient;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
@@ -39,7 +41,7 @@ class ModuleUtils
     }
 
     /**
-     * @return array<array<string, string|null>>
+     * @return Version[]
      */
     public function getVersions(string $moduleName, bool $withAssetOnly = true): array
     {
@@ -53,65 +55,60 @@ class ModuleUtils
             );
         }
 
-        return array_map(fn ($item) => [
-            'version' => $item['tag_name'],
-            'url' => !empty($item['assets']) ? current($item['assets'])['browser_download_url'] : null,
-        ], $versions);
+        return array_map(fn ($item) => new Version(
+            $item['tag_name'],
+            !empty($item['assets']) ? current($item['assets'])['browser_download_url'] : null
+        ), $versions);
     }
 
-    /**
-     * @param array<string, string|null> $version
-     */
-    public function download(string $module, array $version): void
+    public function download(string $moduleName, Version $version): void
     {
-        if ($version['url'] === null) {
+        if ($version->getUrl() === null) {
             return;
         }
 
-        $path = join('/', [$this->moduleDir, $module, $version['version']]);
+        $path = join('/', [$this->moduleDir, $moduleName, $version->getVersion()]);
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
         }
 
-        $response = $this->client->get($version['url']);
-        file_put_contents($path . '/' . $module . '.zip', $response->getBody());
+        $response = $this->client->get($version->getUrl());
+        file_put_contents($path . '/' . $moduleName . '.zip', $response->getBody());
     }
 
     /**
-     * @return array<string, array<int, string>>
+     * @return Module[]
      */
-    public function getModules(): array
+    public function getLocalModules(): array
     {
         $modules = [];
         $exclude = ['.', '..'];
         if (!$modulesScandir = scandir($this->moduleDir)) {
             return [];
         }
-        foreach ($modulesScandir as $module) {
-            if (in_array($module, $exclude) || !is_dir($this->moduleDir . '/' . $module)) {
+        foreach ($modulesScandir as $moduleName) {
+            if (in_array($moduleName, $exclude) || !is_dir($this->moduleDir . '/' . $moduleName)) {
                 continue;
             }
-            if (!$moduleVersionsScandir = scandir($this->moduleDir . '/' . $module)) {
+            if (!$moduleVersionsScandir = scandir($this->moduleDir . '/' . $moduleName)) {
                 continue;
             }
-            $modules[$module] = [];
+            $module = new Module($moduleName);
             foreach ($moduleVersionsScandir as $version) {
                 if (in_array($version, $exclude)) {
                     continue;
                 }
-                $modules[$module][] = $version;
+                $module->addVersion(new Version($version));
             }
+            $modules[] = $module;
         }
 
         return $modules;
     }
 
-    /**
-     * @return array{'version': string, 'versionCompliancyMin': string|null, 'versionCompliancyMax': string|null}
-     */
-    public function getInformation(string $moduleName, string $version): array
+    public function setVersionCompliancy(string $moduleName, Version $version): void
     {
-        $filename = join('/', [$this->moduleDir, $moduleName, $version, $moduleName . '.zip']);
+        $filename = join('/', [$this->moduleDir, $moduleName, $version->getVersion(), $moduleName . '.zip']);
 
         if (!is_dir($this->tmpDir)) {
             mkdir($this->tmpDir, 0777, true);
@@ -124,11 +121,8 @@ class ModuleUtils
 
         $info = current($this->parser->parseModule($this->tmpDir . '/' . $moduleName));
 
-        return [
-            'version' => $info['version'],
-            'versionCompliancyMin' => $info['versionCompliancyMin'] === self::PS_VERSION ? null : $info['versionCompliancyMin'],
-            'versionCompliancyMax' => $info['versionCompliancyMax'] === self::PS_VERSION ? null : $info['versionCompliancyMax'],
-        ];
+        $version->setVersionCompliancyMin($info['versionCompliancyMin'] === self::PS_VERSION ? null : $info['versionCompliancyMin']);
+        $version->setVersionCompliancyMax($info['versionCompliancyMax'] === self::PS_VERSION ? null : $info['versionCompliancyMax']);
     }
 
     /**

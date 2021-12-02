@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Model\Module;
 use App\Util\ModuleUtils;
 use Github\Client;
 use Symfony\Component\Console\Command\Command;
@@ -31,14 +32,11 @@ class GenerateJsonCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $modules = $this->moduleUtils->getModules();
-        foreach ($modules as $module => $versions) {
-            if (!isset($infos[$module])) {
-                $infos[$module] = [];
-            }
-            foreach ($versions as $version) {
-                $output->writeln(sprintf('<info>Parsing module %s %s</info>', $module, $version));
-                $infos[$module][] = $this->moduleUtils->getInformation($module, $version);
+        $modules = $this->moduleUtils->getLocalModules();
+        foreach ($modules as $module) {
+            foreach ($module->getVersions() as $version) {
+                $output->writeln(sprintf('<info>Parsing module %s %s</info>', $module->getName(), $version->getVersion()));
+                $this->moduleUtils->setVersionCompliancy($module->getName(), $version);
             }
         }
 
@@ -51,8 +49,8 @@ class GenerateJsonCommand extends Command
         }
 
         $output->writeln('<info>Generating main modules.json</info>');
-        $this->generateModulesJson($infos);
-        $this->generatePrestaShopModulesJson($infos, $prestashopVersions, $output);
+        $this->generateModulesJson($modules);
+        $this->generatePrestaShopModulesJson($modules, $prestashopVersions, $output);
 
         return static::SUCCESS;
     }
@@ -73,38 +71,38 @@ class GenerateJsonCommand extends Command
     }
 
     /**
-     * @param array<string, array<int, array<string, string|null>>> $moduleInfos
+     * @param Module[] $modules
      */
-    private function generateModulesJson(array $moduleInfos): void
+    private function generateModulesJson(array $modules): void
     {
-        file_put_contents($this->jsonDir . '/modules.json', json_encode($moduleInfos));
+        file_put_contents($this->jsonDir . '/modules.json', json_encode($modules));
     }
 
     /**
-     * @param array<string, array<int, array{'version': string, 'versionCompliancyMin': string|null, 'versionCompliancyMax': string|null}>> $moduleInfos
+     * @param Module[] $modules
      * @param non-empty-array<string> $prestashopVersions
      */
     private function generatePrestaShopModulesJson(
-        array $moduleInfos,
+        array $modules,
         array $prestashopVersions,
         OutputInterface $output
     ): void {
         $infos = [];
         foreach ($prestashopVersions as $prestashopVersion) {
             $infos[$prestashopVersion] = [];
-            foreach ($moduleInfos as $module => $versions) {
-                foreach ($versions as $version) {
-                    if (null === $version['versionCompliancyMin']) {
+            foreach ($modules as $module) {
+                foreach ($module->getVersions() as $version) {
+                    if (null === $version->getVersionCompliancyMin()) {
                         continue;
                     }
                     if (
-                        version_compare($prestashopVersion, $version['versionCompliancyMin'], '>')
+                        version_compare($prestashopVersion, $version->getVersionCompliancyMin(), '>')
                         && (
-                            empty($infos[$prestashopVersion][$module])
-                            || version_compare($version['version'], $infos[$prestashopVersion][$module]['version'], '>')
+                            empty($infos[$prestashopVersion][$module->getName()])
+                            || version_compare($version->getVersion(), $infos[$prestashopVersion][$module->getName()]->getVersion(), '>')
                         )
                     ) {
-                        $infos[$prestashopVersion][$module] = $version;
+                        $infos[$prestashopVersion][$module->getName()] = $version;
                     }
                 }
             }

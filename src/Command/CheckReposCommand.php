@@ -31,17 +31,17 @@ class CheckReposCommand extends Command
         return self::SUCCESS;
     }
 
-    private function checkModule(string $module, OutputInterface $output): void
+    private function checkModule(string $moduleName, OutputInterface $output): void
     {
-        $output->writeln(sprintf('<info>Checking module %s</info>', $module));
-        $versions = $this->moduleUtils->getVersions($module, false);
+        $output->writeln(sprintf('<info>Checking module %s</info>', $moduleName));
+        $versions = $this->moduleUtils->getVersions($moduleName, false);
         if (empty($versions)) {
-            $output->writeln(sprintf('<error>No release for module %s</error>', $module));
+            $output->writeln(sprintf('<error>No release for module %s</error>', $moduleName));
         }
         foreach ($versions as $version) {
-            if ($version['url'] === null) {
+            if ($version->getUrl() === null) {
                 $output->writeln(
-                    sprintf('<error>No asset for release %s of module %s</error>', $version['version'], $module)
+                    sprintf('<error>No asset for release %s of module %s</error>', $version->getVersion(), $moduleName)
                 );
             }
         }
