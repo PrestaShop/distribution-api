@@ -6,8 +6,10 @@ namespace Tests\Command;
 
 use App\Command\GenerateJsonCommand;
 use App\Model\Module;
+use App\Model\PrestaShop;
 use App\Model\Version;
 use App\Util\ModuleUtils;
+use App\Util\PrestaShopUtils;
 use Github\Client as GithubClient;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
@@ -29,9 +31,8 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
                 $this->createMock(Client::class),
                 $githubClient,
                 __DIR__ . '/../ressources/modules',
-                __DIR__ . '/../../var/tmp',
             ])
-            ->onlyMethods(['downloadMainClass', 'getLocalModules'])
+            ->onlyMethods(['getLocalModules'])
             ->getMock()
         ;
         $moduleUtils->method('getLocalModules')->willReturn([
@@ -46,19 +47,28 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
                 new Version('v1.3.0'),
             ]),
         ]);
-
-        $this->command = $this->getMockBuilder(GenerateJsonCommand::class)
+        $prestaShopUtils = $this->getMockBuilder(PrestaShopUtils::class)
             ->setConstructorArgs([
-                $moduleUtils,
                 $githubClient,
-                __DIR__ . '/../output',
+                $this->createMock(Client::class),
+                __DIR__ . '/../ressources/prestashop',
             ])
-            ->onlyMethods(['getPrestaShopVersions'])
+            ->onlyMethods(['getLocalVersions'])
             ->getMock()
         ;
-        $this->command->method('getPrestaShopVersions')->willReturn([
-            '1.6.1.4', '1.6.1.24', '1.7.0.0', '1.7.7.8', '1.7.8.1',
+        $prestaShopUtils->method('getLocalVersions')->willReturn([
+            new PrestaShop('1.6.1.4'),
+            new PrestaShop('1.6.1.24'),
+            new PrestaShop('1.7.0.0'),
+            new PrestaShop('1.7.7.8'),
+            new PrestaShop('1.7.8.1'),
         ]);
+
+        $this->command = new GenerateJsonCommand(
+            $moduleUtils,
+            $prestaShopUtils,
+            __DIR__ . '/../output'
+        );
     }
 
     public function testGenerateJson()
@@ -86,6 +96,11 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
         $this->assertJsonFileEqualsJsonFile(
             $baseExpected . '/1.7.8.1/modules.json',
             $baseOutput . '/1.7.8.1/modules.json'
+        );
+
+        $this->assertJsonFileEqualsJsonFile(
+            $baseExpected . '/prestashop.json',
+            $baseOutput . '/prestashop.json'
         );
     }
 }

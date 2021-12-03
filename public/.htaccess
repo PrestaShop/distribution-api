@@ -3,5 +3,5 @@ ErrorDocument 404 '{"error": 404}'
 <IfModule mod_rewrite.c>
    RewriteEngine on
    RewriteRule ^modules/([\d\.]+)/?$ json/$1/modules.json
-   RewriteRule ^$ - [R=404]
+   RewriteRule ^$ json/prestashop.json
 </IfModule>

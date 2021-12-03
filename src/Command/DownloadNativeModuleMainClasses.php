@@ -9,9 +9,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DownloadNativeModulesCommand extends Command
+class DownloadNativeModuleMainClasses extends Command
 {
-    protected static $defaultName = 'downloadNativeModules';
+    protected static $defaultName = 'downloadNativeModuleMainClasses';
 
     private ModuleUtils $moduleUtils;
 

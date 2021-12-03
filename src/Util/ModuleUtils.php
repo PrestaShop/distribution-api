@@ -24,7 +24,7 @@ class ModuleUtils
         ModuleParser $moduleParser,
         Client $client,
         GithubClient $githubClient,
-        string $moduleDir = __DIR__ . '/../../var/tmp',
+        string $moduleDir = __DIR__ . '/../../var/tmp/modules',
     ) {
         $this->parser = $moduleParser;
         $this->client = $client;
@@ -76,7 +76,7 @@ class ModuleUtils
     {
         $modules = [];
         $exclude = ['.', '..'];
-        if (!$modulesScandir = scandir($this->moduleDir)) {
+        if (!is_dir($this->moduleDir) || !$modulesScandir = scandir($this->moduleDir)) {
             return [];
         }
         foreach ($modulesScandir as $moduleName) {

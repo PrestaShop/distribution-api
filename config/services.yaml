@@ -16,10 +16,15 @@ services:
 
   App\Util\ModuleUtils:
 
+  App\Util\PrestaShopUtils:
+
   App\Command\GenerateJsonCommand:
     tags: ['console.command']
 
-  App\Command\DownloadNativeModulesCommand:
+  App\Command\DownloadNativeModuleMainClasses:
+    tags: ['console.command']
+
+  App\Command\DownloadPrestaShopInstallVersions:
     tags: ['console.command']
 
   App\Command\CleanCommand:

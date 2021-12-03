@@ -13,21 +13,24 @@ use Symfony\Component\Finder\Finder;
 
 class CleanCommand extends Command
 {
-    private const ACCEPTED_DIRECTORIES = ['all', 'json', 'modules'];
+    private const ACCEPTED_DIRECTORIES = ['all', 'json', 'modules', 'prestashop'];
 
     protected static $defaultName = 'clean';
 
     private Filesystem $filesystem;
     private string $moduleDir;
+    private string $prestaShopDir;
     private string $jsonDir;
 
     public function __construct(
-        string $moduleDir = __DIR__ . '/../../var/tmp',
+        string $moduleDir = __DIR__ . '/../../var/tmp/modules',
+        string $prestaShopDir = __DIR__ . '/../../var/tmp/prestashop',
         string $jsonDir = __DIR__ . '/../../public/json',
     ) {
         parent::__construct();
         $this->filesystem = new Filesystem();
         $this->moduleDir = $moduleDir;
+        $this->prestaShopDir = $prestaShopDir;
         $this->jsonDir = $jsonDir;
     }
 
@@ -49,6 +52,9 @@ class CleanCommand extends Command
             case 'modules':
                 $this->cleanModules($output);
                 break;
+            case 'prestashop':
+                $this->cleanPrestaShop($output);
+                break;
             case 'json':
                 $this->cleanJson($output);
                 break;
@@ -66,17 +72,30 @@ class CleanCommand extends Command
     {
         $this->cleanJson($output);
         $this->cleanModules($output);
+        $this->cleanPrestaShop($output);
     }
 
     private function cleanJson(OutputInterface $output): void
     {
-        $this->filesystem->remove((new Finder())->in($this->jsonDir));
+        if (is_dir($this->jsonDir)) {
+            $this->filesystem->remove((new Finder())->in($this->jsonDir));
+        }
         $output->writeln('<info>Json folder cleaned</info>');
     }
 
     private function cleanModules(OutputInterface $output): void
     {
-        $this->filesystem->remove((new Finder())->in($this->moduleDir));
+        if (is_dir($this->moduleDir)) {
+            $this->filesystem->remove((new Finder())->in($this->moduleDir));
+        }
         $output->writeln('<info>Modules folder cleaned</info>');
+    }
+
+    private function cleanPrestaShop(OutputInterface $output): void
+    {
+        if (is_dir($this->prestaShopDir)) {
+            $this->filesystem->remove((new Finder())->in($this->prestaShopDir));
+        }
+        $output->writeln('<info>PrestaShop folder cleaned</info>');
     }
 }
