@@ -42,6 +42,21 @@ class PrestaShop implements JsonSerializable
         $this->maxPhpVersion = $maxPhpVersion;
     }
 
+    public function isStable(): bool
+    {
+        return (bool) preg_match('/^[\d\.]+$/', $this->version);
+    }
+
+    public function isRC(): bool
+    {
+        return (bool) preg_match('/^[\d\.]+\-rc\.\d+$/', $this->version);
+    }
+
+    public function isBeta(): bool
+    {
+        return (bool) preg_match('/^[\d\.]+\-beta\.\d+$/', $this->version);
+    }
+
     public function jsonSerialize()
     {
         return [

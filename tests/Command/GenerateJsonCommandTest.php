@@ -62,6 +62,8 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             new PrestaShop('1.7.0.0'),
             new PrestaShop('1.7.7.8'),
             new PrestaShop('1.7.8.1'),
+            new PrestaShop('1.7.8.0-rc.1'),
+            new PrestaShop('1.7.8.0-beta.1'),
         ]);
 
         $this->command = new GenerateJsonCommand(
@@ -97,10 +99,30 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             $baseExpected . '/1.7.8.1/modules.json',
             $baseOutput . '/1.7.8.1/modules.json'
         );
+        $this->assertJsonFileEqualsJsonFile(
+            $baseExpected . '/1.7.8.0-rc.1/modules.json',
+            $baseOutput . '/1.7.8.0-rc.1/modules.json'
+        );
+        $this->assertJsonFileEqualsJsonFile(
+            $baseExpected . '/1.7.8.0-beta.1/modules.json',
+            $baseOutput . '/1.7.8.0-beta.1/modules.json'
+        );
 
         $this->assertJsonFileEqualsJsonFile(
             $baseExpected . '/prestashop.json',
             $baseOutput . '/prestashop.json'
+        );
+        $this->assertJsonFileEqualsJsonFile(
+            $baseExpected . '/stable/prestashop.json',
+            $baseOutput . '/stable/prestashop.json'
+        );
+        $this->assertJsonFileEqualsJsonFile(
+            $baseExpected . '/rc/prestashop.json',
+            $baseOutput . '/rc/prestashop.json'
+        );
+        $this->assertJsonFileEqualsJsonFile(
+            $baseExpected . '/beta/prestashop.json',
+            $baseOutput . '/beta/prestashop.json'
         );
     }
 }
