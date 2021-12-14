@@ -24,7 +24,7 @@ class PrestaShopUtils
     public function __construct(
         GithubClient $githubClient,
         Client $client,
-        string $prestaShopDir = __DIR__ . '/../../var/tmp/prestashop'
+        string $prestaShopDir
     ) {
         $this->githubClient = $githubClient;
         $this->client = $client;

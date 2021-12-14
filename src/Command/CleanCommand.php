@@ -23,9 +23,9 @@ class CleanCommand extends Command
     private string $jsonDir;
 
     public function __construct(
-        string $moduleDir = __DIR__ . '/../../var/tmp/modules',
-        string $prestaShopDir = __DIR__ . '/../../var/tmp/prestashop',
-        string $jsonDir = __DIR__ . '/../../public/json',
+        string $moduleDir,
+        string $prestaShopDir,
+        string $jsonDir,
     ) {
         parent::__construct();
         $this->filesystem = new Filesystem();

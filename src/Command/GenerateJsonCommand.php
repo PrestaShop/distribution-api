@@ -27,7 +27,7 @@ class GenerateJsonCommand extends Command
     public function __construct(
         ModuleUtils $moduleUtils,
         PrestaShopUtils $prestaShopUtils,
-        string $jsonDir = __DIR__ . '/../../public/json'
+        string $jsonDir
     ) {
         parent::__construct();
         $this->moduleUtils = $moduleUtils;

@@ -5,6 +5,10 @@ services:
   _defaults:
     public: true
     autowire: true
+    bind:
+      $jsonDir: '%kernel.project_dir%/public/json'
+      $moduleDir: '%kernel.project_dir%/var/tmp/modules'
+      $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop'
 
   Github\Client:
     calls:

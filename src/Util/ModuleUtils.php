@@ -24,7 +24,7 @@ class ModuleUtils
         ModuleParser $moduleParser,
         Client $client,
         GithubClient $githubClient,
-        string $moduleDir = __DIR__ . '/../../var/tmp/modules',
+        string $moduleDir
     ) {
         $this->parser = $moduleParser;
         $this->client = $client;
