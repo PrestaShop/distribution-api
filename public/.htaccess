@@ -1,14 +1,12 @@
 ErrorDocument 404 '{"error": 404}'
 
 <IfModule mod_rewrite.c>
-   RewriteEngine on
-   RewriteRule ^modules/?$ json/modules.json [L]
-   RewriteRule ^modules/([\d\.]+)/?$ json/$1/modules.json
-   RewriteRule ^modules/(.+)/version/([\d\.]+)/?$ json/$1/$2.json
-   RewriteRule ^modules/(.+)/version/?$ json/$1/latest.json
-   RewriteRule ^modules/(.+)/download/(v?[\d\.]+)/?$ modules/$1/$2/$1.zip [E=ZIP:1]
-   RewriteRule ^$ - [R=404]
-   RewriteRule ^modules/.*/?$ - [R=404]
+    RewriteEngine on
+    RewriteRule ^modules/([\d\.]+)/?$ json/$1/modules.json [E=REWRITTEN:1,L]
+    RewriteRule ^prestashop/?$ json/prestashop.json [E=REWRITTEN:1,L]
+    RewriteRule ^prestashop/([\d\.]+|stable|rc|beta)/?$ json/$1/prestashop.json [E=REWRITTEN:1,L]
+    RewriteCond %{ENV:REDIRECT_REWRITTEN} !=1
+    RewriteRule ^ - [R=404]
 </IfModule>
 
-Header always set Content-Type application/json env=!REDIRECT_ZIP
+Header always set Content-Type application/json

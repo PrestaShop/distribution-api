@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace Tests\Command;
 
 use App\Command\GenerateJsonCommand;
+use App\Model\Module;
+use App\Model\PrestaShop;
+use App\Model\Version;
 use App\Util\ModuleUtils;
+use App\Util\PrestaShopUtils;
 use Github\Client as GithubClient;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
@@ -27,28 +31,46 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
                 $this->createMock(Client::class),
                 $githubClient,
                 __DIR__ . '/../ressources/modules',
-                __DIR__ . '/../../var/tmp',
             ])
-            ->onlyMethods(['download', 'getModules'])
+            ->onlyMethods(['getLocalModules'])
             ->getMock()
         ;
-        $moduleUtils->method('getModules')->willReturn([
-            'autoupgrade' => ['v4.10.1', 'v4.11.0', 'v4.12.0'],
-            'psgdpr' => ['v1.2.0', 'v1.2.1', 'v1.3.0'],
+        $moduleUtils->method('getLocalModules')->willReturn([
+            new Module('autoupgrade', [
+                new Version('v4.10.1'),
+                new Version('v4.11.0'),
+                new Version('v4.12.0'),
+            ]),
+            new Module('psgdpr', [
+                new Version('v1.2.0'),
+                new Version('v1.2.1'),
+                new Version('v1.3.0'),
+            ]),
+        ]);
+        $prestaShopUtils = $this->getMockBuilder(PrestaShopUtils::class)
+            ->setConstructorArgs([
+                $githubClient,
+                $this->createMock(Client::class),
+                __DIR__ . '/../ressources/prestashop',
+            ])
+            ->onlyMethods(['getLocalVersions'])
+            ->getMock()
+        ;
+        $prestaShopUtils->method('getLocalVersions')->willReturn([
+            new PrestaShop('1.6.1.4'),
+            new PrestaShop('1.6.1.24'),
+            new PrestaShop('1.7.0.0'),
+            new PrestaShop('1.7.7.8'),
+            new PrestaShop('1.7.8.1'),
+            new PrestaShop('1.7.8.0-rc.1'),
+            new PrestaShop('1.7.8.0-beta.1'),
         ]);
 
-        $this->command = $this->getMockBuilder(GenerateJsonCommand::class)
-            ->setConstructorArgs([
-                $moduleUtils,
-                $githubClient,
-                __DIR__ . '/../output',
-            ])
-            ->onlyMethods(['getPrestaShopVersions'])
-            ->getMock()
-        ;
-        $this->command->method('getPrestaShopVersions')->willReturn([
-            '1.6.1.4', '1.6.1.24', '1.7.0.0', '1.7.7.8', '1.7.8.1',
-        ]);
+        $this->command = new GenerateJsonCommand(
+            $moduleUtils,
+            $prestaShopUtils,
+            __DIR__ . '/../output'
+        );
     }
 
     public function testGenerateJson()
@@ -77,49 +99,30 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             $baseExpected . '/1.7.8.1/modules.json',
             $baseOutput . '/1.7.8.1/modules.json'
         );
-
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.6.1.4.json',
-            $baseOutput . '/autoupgrade/1.6.1.4.json'
+            $baseExpected . '/1.7.8.0-rc.1/modules.json',
+            $baseOutput . '/1.7.8.0-rc.1/modules.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.6.1.24.json',
-            $baseOutput . '/autoupgrade/1.6.1.24.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.7.0.0.json',
-            $baseOutput . '/autoupgrade/1.7.0.0.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.7.7.8.json',
-            $baseOutput . '/autoupgrade/1.7.7.8.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/1.7.8.1.json',
-            $baseOutput . '/autoupgrade/1.7.8.1.json'
-        );
-        $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/autoupgrade/latest.json',
-            $baseOutput . '/autoupgrade/latest.json'
+            $baseExpected . '/1.7.8.0-beta.1/modules.json',
+            $baseOutput . '/1.7.8.0-beta.1/modules.json'
         );
 
-        $this->assertFileDoesNotExist($baseOutput . '/psgdpr/1.6.1.4.json');
-        $this->assertFileDoesNotExist($baseOutput . '/psgdpr/1.6.1.24.json');
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/1.7.0.0.json',
-            $baseOutput . '/psgdpr/1.7.0.0.json'
+            $baseExpected . '/prestashop.json',
+            $baseOutput . '/prestashop.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/1.7.7.8.json',
-            $baseOutput . '/psgdpr/1.7.7.8.json'
+            $baseExpected . '/stable/prestashop.json',
+            $baseOutput . '/stable/prestashop.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/1.7.8.1.json',
-            $baseOutput . '/psgdpr/1.7.8.1.json'
+            $baseExpected . '/rc/prestashop.json',
+            $baseOutput . '/rc/prestashop.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/psgdpr/latest.json',
-            $baseOutput . '/psgdpr/latest.json'
+            $baseExpected . '/beta/prestashop.json',
+            $baseOutput . '/beta/prestashop.json'
         );
     }
 }

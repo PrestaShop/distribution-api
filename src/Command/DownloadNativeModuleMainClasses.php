@@ -9,9 +9,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DownloadNativeModulesCommand extends Command
+class DownloadNativeModuleMainClasses extends Command
 {
-    protected static $defaultName = 'downloadNativeModules';
+    protected static $defaultName = 'downloadNativeModuleMainClasses';
 
     private ModuleUtils $moduleUtils;
 
@@ -29,8 +29,8 @@ class DownloadNativeModulesCommand extends Command
         foreach ($modules as $module) {
             $versions = $this->moduleUtils->getVersions($module);
             foreach ($versions as $version) {
-                $output->writeln(sprintf('<info>Downloading %s %s</info>', $module, $version['version']));
-                $this->moduleUtils->download($module, $version);
+                $output->writeln(sprintf('<info>Downloading %s %s</info>', $module, $version->getTag()));
+                $this->moduleUtils->downloadMainClass($module, $version);
             }
         }
 
