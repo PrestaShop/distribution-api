@@ -5,6 +5,8 @@ public/json/*
 var/tmp/*
 !var/tmp/.gitkeep
 
+var/cache/*
+
 tests/output/*
 !tests/output/.gitkeep
 

@@ -3,20 +3,30 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\DependencyInjection\ApplicationCompilerPass;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-$containerBuilder = new ContainerBuilder();
-$containerBuilder->setParameter('kernel.project_dir', __DIR__ . '/..');
-$loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../config/'));
-$loader->load('services.yaml');
-$containerBuilder->compile();
+$containerFile = __DIR__ . '/../var/cache/container.php';
+$containerCache = new ConfigCache($containerFile, false);
 
-$commands = $containerBuilder->findTaggedServiceIds('console.command');
-$commands = array_map(fn($item) => $containerBuilder->get($item), array_keys($commands));
+if (!$containerCache->isFresh()) {
+    $containerBuilder = new ContainerBuilder();
+    $containerBuilder->setParameter('kernel.project_dir', __DIR__ . '/..');
+    $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../config/'));
+    $loader->load('services.yaml');
+    $containerBuilder->addCompilerPass(new ApplicationCompilerPass());
+    $containerBuilder->compile();
 
-$application = new Application();
-$application->addCommands($commands);
-$application->run();
+    $dumper = new PhpDumper($containerBuilder);
+    $containerCache->write($dumper->dump(['class' => 'CachedContainer']), $containerBuilder->getResources());
+}
+
+require_once $containerFile;
+$container = new CachedContainer();
+
+$container->get(Application::class)->run();
