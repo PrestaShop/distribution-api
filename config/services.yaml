@@ -3,12 +3,15 @@ imports:
 
 services:
   _defaults:
-    public: true
+    public: false
     autowire: true
     bind:
       $jsonDir: '%kernel.project_dir%/public/json'
       $moduleDir: '%kernel.project_dir%/var/tmp/modules'
       $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop'
+
+  Symfony\Component\Console\Application:
+    public: true
 
   Github\Client:
     calls:
