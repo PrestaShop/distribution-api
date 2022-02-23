@@ -28,6 +28,6 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0
         with:
           project_id: ${{ secrets.INTEGRATION_GOOGLE_PROJECT }}
-          service_account_key: ${{ secrets.INTEGRATION_GOOGLE_APPLICATION_CREDENTIALS }}
+          credentials_json: ${{ secrets.INTEGRATION_GOOGLE_APPLICATION_CREDENTIALS }}
           export_default_credentials: true
 
