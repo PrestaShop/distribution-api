@@ -1,0 +1,33 @@
+name: INTEGRATION CD DISTRIBUTION API
+
+on:
+  push:
+    branches:
+      - deployment
+
+jobs:
+  distribution_api_integration:
+    name: Distribution API Integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout the repository 🎁
+        uses: actions/checkout@v2
+
+      - name: Setting up PHP ⚙️
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, intl, gd, xml, dom, json, fileinfo, curl, zip, iconv, simplexml
+
+      - name: Installing Dependencies 🧩
+        run: composer install --ansi --prefer-dist --no-interaction --no-progress
+
+      - name: Setting up google Cloud SDK 🏷️
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ secrets.INTEGRATION_GOOGLE_PROJECT }}
+          service_account_key: ${{ secrets.INTEGRATION_GOOGLE_APPLICATION_CREDENTIALS }}
+          export_default_credentials: true
+
