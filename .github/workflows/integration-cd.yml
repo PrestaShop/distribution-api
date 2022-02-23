@@ -30,7 +30,7 @@ jobs:
           credentials_json: '${{ secrets.INTEGRATION_GOOGLE_APPLICATION_CREDENTIALS }}'
           project_id: ${{ secrets.INTEGRATION_GOOGLE_PROJECT }}
 
-      - name: Setting up google Cloud SDK 🏷️
+      - name: Setting up google Cloud SDK 💳
         uses: google-github-actions/setup-gcloud@v0
         with:
           project_id: ${{ secrets.INTEGRATION_GOOGLE_PROJECT }}
@@ -56,8 +56,5 @@ jobs:
       - name: Generating json files... 👷
         run: ./bin/console generateJson
 
-      - name: Pushing modules stuff... 🔥
-        run: gsutil cp -r var/tmp/modules gs://distribution-api-artifacts/
-
-      - name: Pushing prestashop json stuff... 🔥
-        run: gsutil cp -r var/tmp/prestashop gs://distribution-api-artifacts/
+      - name: Pushing json files... 🔥
+        run: gsutil cp -r public/json/* gs://distribution-api-artifacts/
