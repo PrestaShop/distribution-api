@@ -42,4 +42,4 @@ jobs:
           mv config/parameters.yaml.dist config/parameters.yaml 
           sed -i 's/github_token.*/github_token\:\ ${token}/' parameters.yaml 
         env:
-          token: ${{token}}
+          token: ${{secrets.TOKEN}}
