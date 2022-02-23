@@ -38,10 +38,12 @@ jobs:
           export_default_credentials: true
 
       - name: Setting up github token... 🧨
-        
         run: |
           mv config/parameters.yaml.dist config/parameters.yaml 
           sed -i 's/github_token.*/github_token\:\ ${token}/' config/parameters.yaml 
         env:
           token: ${{secrets.TOKEN}}
+
+      - name: Checking the repositories... 🔍
+        run: ./bin/console checkRepos
 
