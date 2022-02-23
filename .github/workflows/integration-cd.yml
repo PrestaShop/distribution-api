@@ -44,10 +44,10 @@ jobs:
         env:
           token: ${{secrets.TOKEN}}
 
-      - name: Checking the repositories... 🔍
+      - name: Checking out the repositories... 🔍
         run: ./bin/console checkRepos
 
-      - name: Checking Native Modules... 🔍
+      - name: Checking Native Modules... 👷
         run: ./bin/console downloadNativeModuleMainClasses
 
       - name: Downloading install php files... 🔍
@@ -56,5 +56,8 @@ jobs:
       - name: Generating json files... 👷
         run: ./bin/console generateJson
 
-      - name: Trying something... 🔍
-        run: gsutil ls gs://distribution-api-artifacts
+      - name: Pushing modules stuff... 🔥
+        run: gsutil cp -r var/tmp/modules gs://distribution-api-artifacts/
+
+      - name: Pushing prestashop json stuff... 🔥
+        run: gsutil cp -r var/tmp/prestashop gs://distribution-api-artifacts/
