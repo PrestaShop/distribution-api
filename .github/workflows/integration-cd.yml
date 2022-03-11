@@ -37,9 +37,9 @@ jobs:
           credentials_json: ${{ secrets.INTEGRATION_GOOGLE_APPLICATION_CREDENTIALS }}
           export_default_credentials: true
 
-#      - name: Setting up github token... 🧨
-#        run: |
-#          mv config/parameters.yaml.dist config/parameters.yaml 
+      - name: Setting up github token... 🧨
+        run: |
+          mv config/parameters.yaml.dist config/parameters.yaml 
 #          sed -i 's/github_token.*/github_token\:\ ${{ secrets.GITHUB_TOKEN }}/' config/parameters.yaml
 #        env:
 #          token: ${{secrets.TOKEN}}
