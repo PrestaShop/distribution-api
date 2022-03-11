@@ -1,15 +1,16 @@
 name: INTEGRATION CD DISTRIBUTION API
 
 on:
-  push:
-    branches:
-      - deployment
+  pull_request:
+    types: [opened,reopened,synchronize,labeled]
 
 jobs:
   distribution_api_integration:
     name: Distribution API Integration
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    timeout-minutes: 15
+    if: contains(github.event.pull_request.labels.*.name, 'integration-deployment')
 
     steps:
       - name: Checkout the repository 🎁
