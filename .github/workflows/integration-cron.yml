@@ -3,7 +3,7 @@ name: INTEGRATION CRON DISTRIBUTION API
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron:  '33,34,35 * * *'
+    - cron:  '35,36,37 * * * *'
 
 jobs:
   distribution_api_integration:
