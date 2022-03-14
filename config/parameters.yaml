@@ -1,0 +1,2 @@
+parameters:
+  github_token: '%env(TOKEN)%'
