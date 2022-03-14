@@ -11,4 +11,6 @@ tests/output/*
 !tests/output/.gitkeep
 
 .php-cs-fixer.cache
-config/parameters.yaml
+
+## Devops Stuff
+*gcp-token.json*

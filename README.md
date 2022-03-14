@@ -41,3 +41,28 @@ Returns every PrestaShop versions
 `http://<domain.to.public.folder>/prestashop/<channel>`<br>
 Returns the latest version of the specified channel<br>
 `<channel>` can be: `stable`, `rc` or `beta`
+
+### Environments
+
+There are 3 targeted environment at the moment:
+
+* **Integration**: integration-api.prestashop-project.org
+* **Préproduction**: preprod-api.prestashop-project.org
+* **Production**: api.prestashop-project.org
+
+Those edge URLs are hosted at the Cloudflare level, proxyfying the origin GCP Storage.
+
+## Architecture
+
+![alt text](pics/architecture.png "Build & Refresh Workflow")
+
+## Workflow
+
+Being on github we'll use the github workflow as follow:
+
+![alt text](pics/workflow.png "Github Workflow")
+
+At the moment, we only have the integration workflow setup:
+
+* **[Integration CD](.github/workflows/integration-cd.yml)**: Mostly manages the development part, is triggered when a PR has the `integration-deployment` label setup
+* **[Integration Cron](.github/workflows/integration-cron.yml)**: Runs every half past hour, from to 9 to 19 UTC time
