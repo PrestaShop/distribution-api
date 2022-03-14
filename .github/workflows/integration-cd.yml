@@ -47,22 +47,22 @@ jobs:
       - name: Checking out the repositories... 🔍
         run: ./bin/console checkRepos
         env:
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Checking Native Modules... 👷
         run: ./bin/console downloadNativeModuleMainClasses
         env:
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Downloading install php files... 🔍
         run: ./bin/console downloadPrestaShopInstallVersions
         env:
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Generating json files... 👷
         run: ./bin/console generateJson
         env:
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Pushing json files... 🔥
         run: gsutil cp -r public/json/* gs://distribution-api-artifacts/
