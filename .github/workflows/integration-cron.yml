@@ -55,6 +55,12 @@ jobs:
           TOKEN: ${{secrets.GITHUB_TOKEN}}
           BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
 
+      - name: Updating modules' yaml config file... ⬆️
+        run: ./bin/console updateModuleConfigFiles
+        env:
+          TOKEN: ${{secrets.GITHUB_TOKEN}}
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+
       - name: Generating json files... 👷
         run: ./bin/console generateJson
         env:

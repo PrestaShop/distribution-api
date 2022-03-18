@@ -55,8 +55,9 @@ class GenerateJsonCommand extends Command
         foreach ($modules as $module) {
             foreach ($module->getVersions() as $version) {
                 $output->writeln(sprintf('<info>Parsing module %s %s</info>', $module->getName(), $version->getTag()));
-                $this->moduleUtils->setVersionCompliancy($module->getName(), $version);
+                $this->moduleUtils->setVersionData($module->getName(), $version);
             }
+            $this->moduleUtils->overrideVersionCompliancyFromYaml($module);
         }
 
         $stable = null;
@@ -108,7 +109,11 @@ class GenerateJsonCommand extends Command
                         continue;
                     }
                     if (
-                        version_compare($prestashopVersion->getVersion(), $version->getVersionCompliancyMin(), '>')
+                        version_compare($prestashopVersion->getVersion(), $version->getVersionCompliancyMin(), '>=')
+                        && (
+                            $version->getVersionCompliancyMax() === null
+                            || version_compare($prestashopVersion->getVersion(), $version->getVersionCompliancyMax(), '<=')
+                        )
                         && (
                             empty($infos[$prestashopVersion->getVersion()][$module->getName()])
                             || version_compare($version->getVersion(), $infos[$prestashopVersion->getVersion()][$module->getName()]->getVersion(), '>')

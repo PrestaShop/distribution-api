@@ -61,8 +61,8 @@ class PrestaShop implements JsonSerializable
     {
         return [
             'version' => $this->getVersion(),
-            'phpMaxVersion' => $this->getMaxPhpVersion(),
-            'phpMinVersion' => $this->getMinPhpVersion(),
+            'php_max_version' => $this->getMaxPhpVersion(),
+            'php_min_version' => $this->getMinPhpVersion(),
         ];
     }
 }
