@@ -48,6 +48,12 @@ $ ./bin/console clean all|json|modules|prestashop
 ```
 This will clean the folder(s) passed as an argument
 
+### Docker
+
+To use this tool with Docker, you have to:
+- Build the image: `$ docker build -t distribution-api .`
+- Run it with the command you want: `$ docker run --rm -e TOKEN=your_github_token distribution-api run`
+
 ## Endpoints
 
 `http://<domain.to.public.folder>/modules/<prestashop_version>`<br>

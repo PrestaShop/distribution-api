@@ -57,7 +57,7 @@ class PrestaShop implements JsonSerializable
         return (bool) preg_match('/^[\d\.]+\-beta\.\d+$/', $this->version);
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [
             'version' => $this->getVersion(),

@@ -60,7 +60,7 @@ class Version implements JsonSerializable
         $this->versionCompliancyMax = $versionCompliancyMax;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return [
             'version' => $this->getVersion(),
