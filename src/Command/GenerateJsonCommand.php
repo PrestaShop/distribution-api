@@ -44,8 +44,8 @@ class GenerateJsonCommand extends Command
             $output->writeln('<error>No module or PrestaShop version found!</error>');
             $output->writeln(sprintf(
                 '<question>Did you run the `%s` and `%s` command?</question>',
-                DownloadNativeModuleMainClasses::getDefaultName(),
-                DownloadPrestaShopInstallVersions::getDefaultName()
+                DownloadNativeModuleMainClassesCommand::getDefaultName(),
+                DownloadPrestaShopInstallVersionsCommand::getDefaultName()
             ));
 
             return static::FAILURE;

@@ -28,14 +28,17 @@ services:
   App\Command\GenerateJsonCommand:
     tags: ['console.command']
 
-  App\Command\DownloadNativeModuleMainClasses:
+  App\Command\DownloadNativeModuleMainClassesCommand:
     tags: ['console.command']
 
-  App\Command\DownloadPrestaShopInstallVersions:
+  App\Command\DownloadPrestaShopInstallVersionsCommand:
     tags: ['console.command']
 
   App\Command\CleanCommand:
     tags: ['console.command']
 
   App\Command\CheckReposCommand:
+    tags: [ 'console.command' ]
+
+  App\Command\RunCommand:
     tags: [ 'console.command' ]

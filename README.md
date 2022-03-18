@@ -8,27 +8,45 @@
 
 ## Usage
 
-#### Check that there is no error on the module's repositories:
-```
-$ ./bin/console checkRepos
-```
+### Main commands
 
 #### Download the module's main files
-```
+```shell
 $ ./bin/console downloadNativeModuleMainClasses
 ```
 This will download only the main file of the module so the app can extract the module's version and the PrestaShop versions compliance
 
 #### Download PrestaShop's `install/install_version.php` files
-```
+```shell
 $ ./bin/console downloadPrestaShopInstallVersions
 ```
 This will download the file `install/install_version.php` so the app can extract the PHP version compatibilities
 
 #### Generate json files
-```
+```shell
 $ ./bin/console generateJson
 ```
+
+#### Everything together
+```shell
+$ ./bin/console run
+```
+This will execute the 3 previous commands:
+- `downloadNativeModuleMainClasses`
+- `downloadPrestaShopInstallVersions`
+- `generateJson`
+
+### Utility commands
+
+#### Check that there is no error on the module's repositories:
+```shell
+$ ./bin/console checkRepos
+```
+
+```shell
+$ ./bin/console clean all|json|modules|prestashop
+```
+This will clean the folder(s) passed as an argument
 
 ## Endpoints
 
