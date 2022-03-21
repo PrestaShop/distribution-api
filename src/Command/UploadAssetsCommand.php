@@ -28,6 +28,7 @@ class UploadAssetsCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $finder = new Finder();
+        $finder->sortByName();
         $jsonFiles = $finder->in($this->jsonDir)->files();
 
         if ($jsonFiles->count() === 0) {
