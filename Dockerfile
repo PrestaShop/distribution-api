@@ -9,6 +9,8 @@ FROM php:8.1-alpine
 COPY --from=builder /app/ /app
 
 ARG TOKEN
+ARG GOOGLE_APPLICATION_CREDENTIALS
+ARG BUCKET_NAME
 
 WORKDIR /app
 

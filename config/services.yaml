@@ -17,6 +17,12 @@ services:
     calls:
       - authenticate: ['%github_token%', 'access_token_header']
 
+  Google\Cloud\Storage\StorageClient:
+
+  Google\Cloud\Storage\Bucket:
+    factory: ['@Google\Cloud\Storage\StorageClient', 'bucket']
+    arguments: ['%bucket_name%']
+
   GuzzleHttp\Client:
 
   Psssst\ModuleParser:
@@ -38,6 +44,9 @@ services:
     tags: ['console.command']
 
   App\Command\CheckReposCommand:
+    tags: [ 'console.command' ]
+
+  App\Command\UploadAssetsCommand:
     tags: [ 'console.command' ]
 
   App\Command\RunCommand:

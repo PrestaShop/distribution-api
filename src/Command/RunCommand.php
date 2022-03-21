@@ -15,16 +15,19 @@ class RunCommand extends Command
     private DownloadNativeModuleMainClassesCommand $downloadNativeModuleMainClassesCommand;
     private DownloadPrestaShopInstallVersionsCommand $downloadPrestaShopInstallVersionsCommand;
     private GenerateJsonCommand $generateJsonCommand;
+    private UploadAssetsCommand $uploadAssetsCommand;
 
     public function __construct(
         DownloadNativeModuleMainClassesCommand $downloadNativeModuleMainClassesCommand,
         DownloadPrestaShopInstallVersionsCommand $downloadPrestaShopInstallVersionsCommand,
-        GenerateJsonCommand $generateJsonCommand
+        GenerateJsonCommand $generateJsonCommand,
+        UploadAssetsCommand $uploadAssetsCommand
     ) {
         parent::__construct();
         $this->downloadNativeModuleMainClassesCommand = $downloadNativeModuleMainClassesCommand;
         $this->downloadPrestaShopInstallVersionsCommand = $downloadPrestaShopInstallVersionsCommand;
         $this->generateJsonCommand = $generateJsonCommand;
+        $this->uploadAssetsCommand = $uploadAssetsCommand;
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
@@ -33,6 +36,7 @@ class RunCommand extends Command
             $this->downloadNativeModuleMainClassesCommand->execute($input, $output) === self::SUCCESS
             && $this->downloadPrestaShopInstallVersionsCommand->execute($input, $output) === self::SUCCESS
             && $this->generateJsonCommand->execute($input, $output) === self::SUCCESS
+            && $this->uploadAssetsCommand->execute($input, $output) === self::SUCCESS
         ) {
             return self::SUCCESS;
         }

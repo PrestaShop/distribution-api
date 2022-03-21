@@ -4,9 +4,15 @@
 
 1. Run `composer install`
 2. Get a Github token: [https://github.com/settings/tokens/new?description=PrestaShopOpenSourceAPI&scopes=repo](https://github.com/settings/tokens/new?description=PrestHubot&scopes=repo)
-3. Copy `config/parameters.yaml.dist` to `config/parameters.yaml` with the generated Github token
+3. Create a bucket on GCP and download a [Service Account key file](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#creatinganaccount)
 
 ## Usage
+
+### Requirements
+You should have 3 environment variables defined:
+- `TOKEN` - The Github token required to use the Github API
+- `GOOGLE_APPLICATION_CREDENTIALS` - Path to the json file previously downloaded containing the authentication information to use GCP
+- `BUCKET_NAME` - The name of the bucket where json files should be uploaded
 
 ### Main commands
 
@@ -26,15 +32,23 @@ This will download the file `install/install_version.php` so the app can extract
 ```shell
 $ ./bin/console generateJson
 ```
+This will generate the different json files to be publicly exposed in the `public/json/` folder
+
+#### Upload generated files to a GCP bucket
+```shell
+$ ./bin/console uploadAssets
+```
+This will upload the generated json files to the GCP bucket
 
 #### Everything together
 ```shell
 $ ./bin/console run
 ```
-This will execute the 3 previous commands:
+This will execute the 4 previous commands:
 - `downloadNativeModuleMainClasses`
 - `downloadPrestaShopInstallVersions`
 - `generateJson`
+- `uploadAssets`
 
 ### Utility commands
 
@@ -43,16 +57,16 @@ This will execute the 3 previous commands:
 $ ./bin/console checkRepos
 ```
 
+#### Clean the folder(s) passed as an argument:
 ```shell
 $ ./bin/console clean all|json|modules|prestashop
 ```
-This will clean the folder(s) passed as an argument
 
 ### Docker
 
 To use this tool with Docker, you have to:
 - Build the image: `$ docker build -t distribution-api .`
-- Run it with the command you want: `$ docker run --rm -e TOKEN=your_github_token distribution-api run`
+- Run it with the command you want: `$ docker run --rm -v /path/to/credentials.json:/app/credentials.json -e TOKEN=your_github_token -e BUCKET_NAME=distribution-api -e GOOGLE_APPLICATION_CREDENTIALS=credentials.json distribution-api run`
 
 ## Endpoints
 
