@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Exception\FilesystemException;
 use App\Model\Module;
 use App\Model\PrestaShop;
 use App\Util\ModuleUtils;
@@ -119,13 +120,19 @@ class GenerateJsonCommand extends Command
             }
         }
 
+        $modulesPath = $this->jsonDir . '/modules';
+        if (!is_dir($modulesPath)) {
+            if (mkdir($modulesPath) === false) {
+                throw new FilesystemException(sprintf('Failed to create directory "%s"', $modulesPath));
+            }
+        }
+
         foreach ($infos as $prestashopVersion => $modules) {
             $output->writeln(sprintf('<info>Generate json for PrestaShop %s</info>', $prestashopVersion));
-            $prestashopVersionPath = $this->jsonDir . '/' . $prestashopVersion;
-            if (!is_dir($prestashopVersionPath)) {
-                mkdir($prestashopVersionPath);
+            $filename = $modulesPath . '/' . $prestashopVersion . '.json';
+            if (file_put_contents($filename, json_encode($modules)) === false) {
+                throw new FilesystemException(sprintf('Failed to write file "%s"', $filename));
             }
-            file_put_contents($prestashopVersionPath . '/modules.json', json_encode($modules));
         }
     }
 
@@ -134,31 +141,38 @@ class GenerateJsonCommand extends Command
      */
     private function generatePrestaShopJson(array $prestashopVersions): void
     {
-        file_put_contents($this->jsonDir . '/prestashop.json', json_encode($prestashopVersions));
+        $prestashopPath = $this->jsonDir . '/prestashop.json';
+        if (file_put_contents($prestashopPath, json_encode($prestashopVersions)) === false) {
+            throw new FilesystemException(sprintf('Failed to write file "%s"', $prestashopPath));
+        }
     }
 
     private function generateChannelsJson(?PrestaShop $stable, ?PrestaShop $rc, ?PrestaShop $beta): void
     {
-        $stablePath = $this->jsonDir . '/stable';
-        $rcPath = $this->jsonDir . '/rc';
-        $betaPath = $this->jsonDir . '/beta';
-        if ($stable !== null) {
-            if (!is_dir($stablePath)) {
-                mkdir($stablePath, 0777, true);
+        $prestashopPath = $this->jsonDir . '/prestashop';
+        if (!is_dir($prestashopPath)) {
+            if (mkdir($prestashopPath, 0777, true) === false) {
+                throw new FilesystemException(sprintf('Failed to create directory "%s"', $prestashopPath));
             }
-            file_put_contents($stablePath . '/prestashop.json', json_encode($stable));
+        }
+
+        if ($stable !== null) {
+            $stablePath = $prestashopPath . '/stable.json';
+            if (file_put_contents($stablePath, json_encode($stable)) === false) {
+                throw new FilesystemException(sprintf('Failed to write file "%s"', $stablePath));
+            }
         }
         if ($rc !== null) {
-            if (!is_dir($rcPath)) {
-                mkdir($rcPath, 0777, true);
+            $rcPath = $prestashopPath . '/rc.json';
+            if (file_put_contents($rcPath, json_encode($rc)) === false) {
+                throw new FilesystemException(sprintf('Failed to write file "%s"', $rcPath));
             }
-            file_put_contents($rcPath . '/prestashop.json', json_encode($rc));
         }
         if ($beta !== null) {
-            if (!is_dir($betaPath)) {
-                mkdir($betaPath, 0777, true);
+            $betaPath = $prestashopPath . '/beta.json';
+            if (file_put_contents($betaPath, json_encode($beta)) === false) {
+                throw new FilesystemException(sprintf('Failed to write file "%s"', $betaPath));
             }
-            file_put_contents($betaPath . '/prestashop.json', json_encode($beta));
         }
     }
 

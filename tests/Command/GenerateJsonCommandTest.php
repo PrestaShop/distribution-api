@@ -80,32 +80,32 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
         $baseExpected = __DIR__ . '/../ressources/json';
 
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/1.6.1.4/modules.json',
-            $baseOutput . '/1.6.1.4/modules.json'
+            $baseExpected . '/modules/1.6.1.4.json',
+            $baseOutput . '/modules/1.6.1.4.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/1.6.1.4/modules.json',
-            $baseOutput . '/1.6.1.24/modules.json'
+            $baseExpected . '/modules/1.6.1.4.json',
+            $baseOutput . '/modules/1.6.1.24.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/1.7.0.0/modules.json',
-            $baseOutput . '/1.7.0.0/modules.json'
+            $baseExpected . '/modules/1.7.0.0.json',
+            $baseOutput . '/modules/1.7.0.0.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/1.7.7.8/modules.json',
-            $baseOutput . '/1.7.7.8/modules.json'
+            $baseExpected . '/modules/1.7.7.8.json',
+            $baseOutput . '/modules/1.7.7.8.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/1.7.8.1/modules.json',
-            $baseOutput . '/1.7.8.1/modules.json'
+            $baseExpected . '/modules/1.7.8.1.json',
+            $baseOutput . '/modules/1.7.8.1.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/1.7.8.0-rc.1/modules.json',
-            $baseOutput . '/1.7.8.0-rc.1/modules.json'
+            $baseExpected . '/modules/1.7.8.0-rc.1.json',
+            $baseOutput . '/modules/1.7.8.0-rc.1.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/1.7.8.0-beta.1/modules.json',
-            $baseOutput . '/1.7.8.0-beta.1/modules.json'
+            $baseExpected . '/modules/1.7.8.0-beta.1.json',
+            $baseOutput . '/modules/1.7.8.0-beta.1.json'
         );
 
         $this->assertJsonFileEqualsJsonFile(
@@ -113,16 +113,16 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             $baseOutput . '/prestashop.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/stable/prestashop.json',
-            $baseOutput . '/stable/prestashop.json'
+            $baseExpected . '/prestashop/stable.json',
+            $baseOutput . '/prestashop/stable.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/rc/prestashop.json',
-            $baseOutput . '/rc/prestashop.json'
+            $baseExpected . '/prestashop/rc.json',
+            $baseOutput . '/prestashop/rc.json'
         );
         $this->assertJsonFileEqualsJsonFile(
-            $baseExpected . '/beta/prestashop.json',
-            $baseOutput . '/beta/prestashop.json'
+            $baseExpected . '/prestashop/beta.json',
+            $baseOutput . '/prestashop/beta.json'
         );
     }
 }

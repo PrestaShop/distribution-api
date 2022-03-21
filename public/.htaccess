@@ -2,9 +2,9 @@ ErrorDocument 404 '{"error": 404}'
 
 <IfModule mod_rewrite.c>
     RewriteEngine on
-    RewriteRule ^modules/([\d\.]+)/?$ json/$1/modules.json [E=REWRITTEN:1,L]
+    RewriteRule ^modules/([\d\.]+)/?$ json/modules/$1.json [E=REWRITTEN:1,L]
     RewriteRule ^prestashop/?$ json/prestashop.json [E=REWRITTEN:1,L]
-    RewriteRule ^prestashop/([\d\.]+|stable|rc|beta)/?$ json/$1/prestashop.json [E=REWRITTEN:1,L]
+    RewriteRule ^prestashop/([\d\.]+|stable|rc|beta)/?$ json/prestashop/$1.json [E=REWRITTEN:1,L]
     RewriteCond %{ENV:REDIRECT_REWRITTEN} !=1
     RewriteRule ^ - [R=404]
 </IfModule>
