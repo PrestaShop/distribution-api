@@ -13,7 +13,8 @@
         "symfony/dependency-injection": "^5.3",
         "symfony/finder": "^5.3",
         "symfony/yaml": "^5.3",
-        "knplabs/github-api": "^3.3"
+        "knplabs/github-api": "^3.3",
+        "google/cloud-storage": "^1.26"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.2",

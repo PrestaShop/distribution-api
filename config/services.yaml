@@ -17,6 +17,12 @@ services:
     calls:
       - authenticate: ['%github_token%', 'access_token_header']
 
+  Google\Cloud\Storage\StorageClient:
+
+  Google\Cloud\Storage\Bucket:
+    factory: ['@Google\Cloud\Storage\StorageClient', 'bucket']
+    arguments: ['%bucket_name%']
+
   GuzzleHttp\Client:
 
   Psssst\ModuleParser:
@@ -28,14 +34,20 @@ services:
   App\Command\GenerateJsonCommand:
     tags: ['console.command']
 
-  App\Command\DownloadNativeModuleMainClasses:
+  App\Command\DownloadNativeModuleMainClassesCommand:
     tags: ['console.command']
 
-  App\Command\DownloadPrestaShopInstallVersions:
+  App\Command\DownloadPrestaShopInstallVersionsCommand:
     tags: ['console.command']
 
   App\Command\CleanCommand:
     tags: ['console.command']
 
   App\Command\CheckReposCommand:
+    tags: [ 'console.command' ]
+
+  App\Command\UploadAssetsCommand:
+    tags: [ 'console.command' ]
+
+  App\Command\RunCommand:
     tags: [ 'console.command' ]
