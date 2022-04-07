@@ -9,10 +9,15 @@ use JsonSerializable;
 class Version implements JsonSerializable
 {
     private string $tag;
+    private ?string $displayName;
+    private ?string $icon;
     private ?string $url;
     private ?string $version;
+    private ?string $author;
     private ?string $versionCompliancyMin;
     private ?string $versionCompliancyMax;
+    private ?string $tab;
+    private ?string $description;
 
     public function __construct(string $tag, string $url = null)
     {
@@ -20,7 +25,7 @@ class Version implements JsonSerializable
         $this->url = $url;
     }
 
-    public function getTag(): ?string
+    public function getTag(): string
     {
         return $this->tag;
     }
@@ -30,14 +35,64 @@ class Version implements JsonSerializable
         return $this->url;
     }
 
+    public function getDisplayName(): ?string
+    {
+        return $this->displayName;
+    }
+
+    public function setDisplayName(?string $displayName): static
+    {
+        $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): static
+    {
+        $this->icon = $icon;
+
+        return $this;
+    }
+
+    public function getTab(): ?string
+    {
+        return $this->tab;
+    }
+
+    public function setTab(?string $tab): static
+    {
+        $this->tab = $tab;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?string
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?string $author): static
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
     public function getVersion(): ?string
     {
         return $this->version;
     }
 
-    public function setVersion(?string $version): void
+    public function setVersion(?string $version): static
     {
         $this->version = $version;
+
+        return $this;
     }
 
     public function getVersionCompliancyMin(): ?string
@@ -45,9 +100,11 @@ class Version implements JsonSerializable
         return $this->versionCompliancyMin;
     }
 
-    public function setVersionCompliancyMin(?string $versionCompliancyMin): void
+    public function setVersionCompliancyMin(?string $versionCompliancyMin): static
     {
         $this->versionCompliancyMin = $versionCompliancyMin;
+
+        return $this;
     }
 
     public function getVersionCompliancyMax(): ?string
@@ -55,17 +112,37 @@ class Version implements JsonSerializable
         return $this->versionCompliancyMax;
     }
 
-    public function setVersionCompliancyMax(?string $versionCompliancyMax): void
+    public function setVersionCompliancyMax(?string $versionCompliancyMax): static
     {
         $this->versionCompliancyMax = $versionCompliancyMax;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
     }
 
     public function jsonSerialize(): mixed
     {
         return [
+            'display_name' => $this->getDisplayName(),
+            'tab' => $this->getTab(),
+            'description' => $this->getDescription(),
+            'author' => $this->getAuthor(),
             'version' => $this->getVersion(),
-            'versionCompliancyMin' => $this->getVersionCompliancyMin(),
-            'versionCompliancyMax' => $this->getVersionCompliancyMax(),
+            'prestashop_min_version' => $this->getVersionCompliancyMin(),
+            'prestashop_max_version' => $this->getVersionCompliancyMax(),
+            'download_url' => $this->getUrl(),
+            'icon' => $this->getIcon(),
         ];
     }
 }

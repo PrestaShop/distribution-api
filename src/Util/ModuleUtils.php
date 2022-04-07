@@ -9,26 +9,33 @@ use App\Model\Version;
 use Github\Client as GithubClient;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
+use Symfony\Component\Yaml\Yaml;
 
 class ModuleUtils
 {
+    public const DOWNLOAD_URL_FILENAME = 'download_url.txt';
+
     private const PS_VERSION = '_PS_VERSION_';
     private const GITHUB_MAIN_CLASS_ENDPOINT = 'https://raw.githubusercontent.com/PrestaShop/%s/%s/%s.php';
+    private const GITHUB_LOGO_ENDPOINT = 'https://raw.githubusercontent.com/PrestaShop/%s/%s/logo.png';
 
     private ModuleParser $parser;
     private Client $client;
     private GithubClient $githubClient;
+    private string $moduleListRepository;
     private string $moduleDir;
 
     public function __construct(
         ModuleParser $moduleParser,
         Client $client,
         GithubClient $githubClient,
+        string $moduleListRepository,
         string $moduleDir
     ) {
         $this->parser = $moduleParser;
         $this->client = $client;
         $this->githubClient = $githubClient;
+        $this->moduleListRepository = $moduleListRepository;
         $this->moduleDir = $moduleDir;
     }
 
@@ -67,6 +74,7 @@ class ModuleUtils
 
         $response = $this->client->get(sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName));
         file_put_contents($path . '/' . $moduleName . '.php', $response->getBody());
+        $this->saveDownloadUrl($moduleName, $version);
     }
 
     /**
@@ -91,7 +99,8 @@ class ModuleUtils
                 if (in_array($version, $exclude)) {
                     continue;
                 }
-                $module->addVersion(new Version($version));
+                $url = $this->getDownloadUrl($moduleName, $version);
+                $module->addVersion(new Version($version, $url));
             }
             $modules[] = $module;
         }
@@ -99,15 +108,40 @@ class ModuleUtils
         return $modules;
     }
 
-    public function setVersionCompliancy(string $moduleName, Version $version): void
+    public function setVersionData(string $moduleName, Version $version): void
     {
         $versionDir = join('/', [$this->moduleDir, $moduleName, $version->getTag()]);
 
         $info = current($this->parser->parseModule($versionDir));
 
-        $version->setVersion($info['version']);
-        $version->setVersionCompliancyMin($info['versionCompliancyMin'] === self::PS_VERSION ? null : $info['versionCompliancyMin']);
-        $version->setVersionCompliancyMax($info['versionCompliancyMax'] === self::PS_VERSION ? null : $info['versionCompliancyMax']);
+        $version
+            ->setVersion($info['version'])
+            ->setVersionCompliancyMin($info['versionCompliancyMin'] === self::PS_VERSION ? null : $info['versionCompliancyMin'])
+            ->setVersionCompliancyMax($info['versionCompliancyMax'] === self::PS_VERSION ? null : $info['versionCompliancyMax'])
+            ->setTab($info['tab'] ?? null)
+            ->setAuthor($info['author'] ?? null)
+            ->setIcon($this->getLogoUrl($moduleName, $version))
+            ->setDisplayName($info['displayName'] ?? null)
+            ->setDescription($info['description'] ?? null)
+        ;
+    }
+
+    public function overrideVersionCompliancyFromYaml(Module $module): void
+    {
+        [$username, $repository] = explode('/', $this->moduleListRepository);
+        $filename = $module->getName() . '.yml';
+
+        /** @var array<string, string> $file */
+        $file = $this->githubClient->repo()->contents()->show($username, $repository, $filename);
+        /** @var array<string, array<string, string>> $content */
+        $content = Yaml::parse(base64_decode($file['content']));
+
+        foreach ($module->getVersions() as $version) {
+            if (isset($content[$version->getTag()])) {
+                $version->setVersionCompliancyMax($content[$version->getTag()]['max']);
+                $version->setVersionCompliancyMin($content[$version->getTag()]['min']);
+            }
+        }
     }
 
     /**
@@ -115,10 +149,43 @@ class ModuleUtils
      */
     public function getNativeModuleList(): array
     {
-        $tree = $this->githubClient->git()->trees()->show('PrestaShop', 'PrestaShop-modules', 'master');
+        [$username, $repository] = explode('/', $this->moduleListRepository);
 
-        $modules = array_filter($tree['tree'], fn ($item) => $item['type'] === 'commit');
+        /** @var array<string, array<string, string>> $files */
+        $files = $this->githubClient->repository()->contents()->show($username, $repository);
 
-        return array_map(fn ($item) => $item['path'], $modules);
+        $modules = array_filter($files, fn ($item) => str_ends_with($item['name'], '.yml'));
+
+        return array_map(fn ($item) => substr($item['name'], 0, -4), $modules);
+    }
+
+    private function saveDownloadUrl(string $moduleName, Version $version): void
+    {
+        $path = $this->getDownloadUrlFilePath($moduleName, $version->getTag());
+        file_put_contents($path, $version->getUrl());
+    }
+
+    private function getDownloadUrl(string $moduleName, string $version): ?string
+    {
+        $path = $this->getDownloadUrlFilePath($moduleName, $version);
+        if (!is_file($path)) {
+            return null;
+        }
+
+        return file_get_contents($path) ?: null;
+    }
+
+    private function getDownloadUrlFilePath(string $moduleName, string $version): string
+    {
+        return join('/', [$this->moduleDir, $moduleName, $version, static::DOWNLOAD_URL_FILENAME]);
+    }
+
+    private function getLogoUrl(string $moduleName, Version $version): string
+    {
+        return sprintf(
+            self::GITHUB_LOGO_ENDPOINT,
+            $moduleName,
+            $version->getTag()
+        );
     }
 }

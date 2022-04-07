@@ -9,6 +9,7 @@ services:
       $jsonDir: '%kernel.project_dir%/public/json'
       $moduleDir: '%kernel.project_dir%/var/tmp/modules'
       $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop'
+      $moduleListRepository: '%module_list_repository%'
 
   Symfony\Component\Console\Application:
     public: true
@@ -33,6 +34,9 @@ services:
 
   App\Command\GenerateJsonCommand:
     tags: ['console.command']
+
+  App\Command\UpdateModuleConfigFilesCommand:
+    tags: [ 'console.command' ]
 
   App\Command\DownloadNativeModuleMainClassesCommand:
     tags: ['console.command']

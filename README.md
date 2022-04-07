@@ -3,7 +3,7 @@
 ## Installation
 
 1. Run `composer install`
-2. Get a Github token: [https://github.com/settings/tokens/new?description=PrestaShopOpenSourceAPI&scopes=repo](https://github.com/settings/tokens/new?description=PrestHubot&scopes=repo)
+2. Get a Github token (with write rights on the repository defined in `config/parameters.yaml`: [https://github.com/settings/tokens/new?description=PrestaShopOpenSourceAPI&scopes=repo](https://github.com/settings/tokens/new?description=PrestHubot&scopes=repo)
 3. Create a bucket on GCP and download a [Service Account key file](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#creatinganaccount)
 
 ## Usage
@@ -28,6 +28,12 @@ $ ./bin/console downloadPrestaShopInstallVersions
 ```
 This will download the file `install/install_version.php` so the app can extract the PHP version compatibilities
 
+#### Update modules' config file
+```shell
+$ ./bin/console updateModuleConfigFiles
+```
+This will add new versions of module with their PrestaShop versions compatibility to the repository defined for the key `module_list_repository` in `config/parameters.yaml`
+
 #### Generate json files
 ```shell
 $ ./bin/console generateJson
@@ -44,9 +50,10 @@ This will upload the generated json files to the GCP bucket
 ```shell
 $ ./bin/console run
 ```
-This will execute the 4 previous commands:
+This will execute the 5 previous commands:
 - `downloadNativeModuleMainClasses`
 - `downloadPrestaShopInstallVersions`
+- `updateModuleConfigFiles`
 - `generateJson`
 - `uploadAssets`
 

@@ -1428,16 +1428,16 @@
         },
         {
             "name": "prestashop/psssst",
-            "version": "v1.2",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PrestaShop/psssst.git",
-                "reference": "3b1c16deaf531f9033f7418fd9f2880ca7b6febd"
+                "reference": "6585926c4f59860139580c7f3a0fa0bf117bd31b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PrestaShop/psssst/zipball/3b1c16deaf531f9033f7418fd9f2880ca7b6febd",
-                "reference": "3b1c16deaf531f9033f7418fd9f2880ca7b6febd",
+                "url": "https://api.github.com/repos/PrestaShop/psssst/zipball/6585926c4f59860139580c7f3a0fa0bf117bd31b",
+                "reference": "6585926c4f59860139580c7f3a0fa0bf117bd31b",
                 "shasum": ""
             },
             "require": {
@@ -1468,9 +1468,9 @@
             "description": "A PrestaShop module analyzer",
             "support": {
                 "issues": "https://github.com/PrestaShop/psssst/issues",
-                "source": "https://github.com/PrestaShop/psssst/tree/v1.2"
+                "source": "https://github.com/PrestaShop/psssst/tree/v1.2.1"
             },
-            "time": "2021-10-28T12:56:06+00:00"
+            "time": "2022-03-21T10:55:21+00:00"
         },
         {
             "name": "psr/cache",
@@ -6095,5 +6095,5 @@
         "ext-zip": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
