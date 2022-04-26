@@ -18,7 +18,7 @@ jobs:
       - name: Setting up google Cloud SDK 💳
         uses: google-github-actions/setup-gcloud@v0
         with:
-          project_id: psessentials-integration
+          project_id: core-oss-integration
           service_account_key: ${{ secrets.G_CREDENTIAL }}
           export_default_credentials: true
 
