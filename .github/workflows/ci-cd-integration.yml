@@ -19,7 +19,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0
         with:
           project_id: core-oss-integration
-          service_account_key: ${{ secrets.G_CREDENTIAL }}
+          service_account_key: ${{ secrets.G_CREDENTIAL_INTEGRATION }}
           export_default_credentials: true
 
       - name: Configure gcloud 👷
