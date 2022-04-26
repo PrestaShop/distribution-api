@@ -33,7 +33,7 @@ jobs:
       - name: Trigger deploy 🚀
         uses: aurelien-baudet/workflow-dispatch@v2
         with:
-          workflow: integration-deployment.yml
+          workflow: deployment-integration.yml
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
           token: ${{ secrets.ACCESS_TOKEN }}
           ref: 'refs/heads/main'
