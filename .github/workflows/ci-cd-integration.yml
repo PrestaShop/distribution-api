@@ -34,6 +34,6 @@ jobs:
         uses: aurelien-baudet/workflow-dispatch@v2
         with:
           workflow: integration-deployment.yml
-          repo: PrestaShopCop/terraform-core-oss-distribution-api
+          repo: PrestaShopCorp/terraform-core-oss-distribution-api
           token: ${{ secrets.ACCESS_TOKEN }}
           ref: 'refs/heads/feat/distribution-api-scheduler-service-account'
