@@ -29,3 +29,11 @@ jobs:
         run: |
           docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" .
           docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest
+
+      - name: Trigger deploy 🚀
+        uses: aurelien-baudet/workflow-dispatch@v2
+        with:
+          workflow: integration-deployment.yml
+          repo: PrestaShopCorp/terraform-core-oss-distribution-api
+          token: ${{ secrets.ACCESS_TOKEN }}
+          ref: 'refs/heads/feat/distribution-api-scheduler-service-account'
