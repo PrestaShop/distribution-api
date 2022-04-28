@@ -1,15 +1,15 @@
 name: PREPRODUCTION CD DISTRIBUTION API
 
 on:
-  pull_request:
-    types: [opened,reopened,synchronize,labeled]
+  push:
+    branches:
+      - main
 
 jobs:
   distribution_api_preproduction:
     name: Distribution API Pre Production
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    if: contains(github.event.pull_request.labels.*.name, 'preproduction-deployment')
 
     steps:
       - name: Checkout the repository 🎁
