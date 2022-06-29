@@ -15,20 +15,20 @@ jobs:
       - name: Checkout the repository 🎁
         uses: actions/checkout@v2
 
-      - name: Setting up google Cloud SDK 💳
-        uses: google-github-actions/setup-gcloud@v0
-        with:
-          project_id: core-oss-integration
-          service_account_key: ${{ secrets.G_CREDENTIALS_INTEGRATION }}
-          export_default_credentials: true
-
-      - name: Configure gcloud 👷
-        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
-
-      - name: Build and publish Dockerfile 📦
-        run: |
-          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" .
-          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest
+#      - name: Setting up google Cloud SDK 💳
+#        uses: google-github-actions/setup-gcloud@v0
+#        with:
+#          project_id: core-oss-integration
+#          service_account_key: ${{ secrets.G_CREDENTIALS_INTEGRATION }}
+#          export_default_credentials: true
+#
+#      - name: Configure gcloud 👷
+#        run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+#
+#      - name: Build and publish Dockerfile 📦
+#        run: |
+#          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" .
+#          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest
 
       - name: Trigger deploy 🚀
         uses: aurelien-baudet/workflow-dispatch@v2
