@@ -107,7 +107,4 @@ Being on github we'll use the github workflow as follow:
 
 ![alt text](pics/workflow.png "Github Workflow")
 
-At the moment, we only have the integration workflow setup:
 
-* **[Integration CD](.github/workflows/integration-cd.yml)**: Mostly manages the development part, is triggered when a PR has the `integration-deployment` label setup
-* **[Integration Cron](.github/workflows/integration-cron.yml)**: Runs every half past hour, from to 9 to 19 UTC time
