@@ -3,7 +3,7 @@ name: PRODUCTION CD DISTRIBUTION API
 on:
   push:
     branches:
-      - 
+      - main
 
 jobs:
   distribution_api_production:
