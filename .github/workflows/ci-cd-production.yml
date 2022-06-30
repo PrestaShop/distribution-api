@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - addingProductionWorkflow
 
 jobs:
   distribution_api_production:
