@@ -3,7 +3,6 @@ name: PRODUCTION CD DISTRIBUTION API
 on:
   push:
     branches:
-      - main
       - addingProductionWorkflow
 
 jobs:
