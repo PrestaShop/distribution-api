@@ -4,11 +4,8 @@ concurrency:
   group: production
 
 on:
-  push:
-    branches:
-      - addingProductionWorkflow
-    tags:
-      - '*'
+  release:
+    types: [released]
 
 jobs:
   distribution_api_production:
