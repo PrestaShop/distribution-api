@@ -38,5 +38,5 @@ jobs:
         with:
           workflow: deployment-preproduction.yml
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.ACCESS_TOKEN_PREPRODUCTION }}
           ref: 'refs/heads/main'

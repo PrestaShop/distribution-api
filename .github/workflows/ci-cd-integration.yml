@@ -38,5 +38,5 @@ jobs:
         with:
           workflow: deployment-integration.yml
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.ACCESS_TOKEN_INTEGRATION }}
           ref: 'refs/heads/main'
