@@ -1,5 +1,8 @@
 name: PRODUCTION CD DISTRIBUTION API
 
+concurrency:
+  group: production
+
 on:
   push:
     branches:

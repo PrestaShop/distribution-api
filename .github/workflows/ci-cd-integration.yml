@@ -1,5 +1,8 @@
 name: INTEGRATION CD DISTRIBUTION API
 
+concurrency:
+  group: integration-${{ github.ref }}
+
 on:
   pull_request:
     types: [opened,reopened,synchronize,labeled]

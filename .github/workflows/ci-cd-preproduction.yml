@@ -1,5 +1,8 @@
 name: PREPRODUCTION CD DISTRIBUTION API
 
+concurrency:
+  group: preprod
+
 on:
   push:
     branches:
