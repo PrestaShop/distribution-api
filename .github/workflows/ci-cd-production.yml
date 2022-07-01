@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - addingProductionWorkflow
+    tags:
+      - '*'
 
 jobs:
   distribution_api_production:
@@ -35,5 +37,5 @@ jobs:
         with:
           workflow: deployment-production.yml
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.ACCESS_TOKEN_PRODUCTION }}
           ref: 'refs/heads/main'
