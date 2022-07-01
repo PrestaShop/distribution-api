@@ -1,16 +1,15 @@
-name: PREPRODUCTION CD DISTRIBUTION API
+name: PRODUCTION CD DISTRIBUTION API
 
 concurrency:
-  group: preprod
+  group: production
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [released]
 
 jobs:
-  distribution_api_preproduction:
-    name: Distribution API Pre Production
+  distribution_api_production:
+    name: Distribution API Production
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -21,8 +20,8 @@ jobs:
       - name: Setting up google Cloud SDK 💳
         uses: google-github-actions/setup-gcloud@v0
         with:
-          project_id: core-oss-preproduction
-          service_account_key: ${{ secrets.G_CREDENTIALS_PREPRODUCTION }}
+          project_id: core-oss-production
+          service_account_key: ${{ secrets.G_CREDENTIALS_PRODUCTION }}
           export_default_credentials: true
 
       - name: Configure gcloud 👷
@@ -30,13 +29,13 @@ jobs:
 
       - name: Build and publish Dockerfile 📦
         run: |
-          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-preproduction/distribution-api/distribution-api:latest" .
-          docker push europe-west1-docker.pkg.dev/core-oss-preproduction/distribution-api/distribution-api:latest
+          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-production/distribution-api/distribution-api:latest" .
+          docker push europe-west1-docker.pkg.dev/core-oss-production/distribution-api/distribution-api:latest
 
       - name: Trigger deploy 🚀
         uses: aurelien-baudet/workflow-dispatch@v2
         with:
-          workflow: deployment-preproduction.yml
+          workflow: deployment-production.yml
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
-          token: ${{ secrets.ACCESS_TOKEN_PREPRODUCTION }}
+          token: ${{ secrets.ACCESS_TOKEN_PRODUCTION }}
           ref: 'refs/heads/main'
