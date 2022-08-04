@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Test\Model;
+namespace Tests\Model;
 
 use App\Model\PrestaShop;
 use PHPUnit\Framework\TestCase;

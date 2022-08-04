@@ -10,6 +10,7 @@ services:
       $moduleDir: '%kernel.project_dir%/var/tmp/modules'
       $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop'
       $moduleListRepository: '%module_list_repository%'
+      $prestaShopMinVersion: '%prestashop_min_version%'
 
   Symfony\Component\Console\Application:
     public: true

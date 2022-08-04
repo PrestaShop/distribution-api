@@ -20,14 +20,17 @@ class PrestaShopUtils
     private GithubClient $githubClient;
     private Client $client;
     private string $prestaShopDir;
+    private string $prestaShopMinVersion;
 
     public function __construct(
         GithubClient $githubClient,
         Client $client,
-        string $prestaShopDir
+        string $prestaShopMinVersion,
+        string $prestaShopDir,
     ) {
         $this->githubClient = $githubClient;
         $this->client = $client;
+        $this->prestaShopMinVersion = $prestaShopMinVersion;
         $this->prestaShopDir = $prestaShopDir;
     }
 
@@ -51,7 +54,11 @@ class PrestaShopUtils
         $versions = [];
         $releasesApi = $this->githubClient->repo()->releases();
         while (count($results = $releasesApi->all('PrestaShop', 'PrestaShop', ['page' => $page++])) > 0) {
-            $versions = array_merge($versions, array_filter($results, fn ($item) => !empty($item['assets'])));
+            $versions = array_merge($versions, array_filter(
+                $results,
+                fn ($item) => !empty($item['assets'])
+                    && version_compare($item['tag_name'], $this->prestaShopMinVersion, '>=')
+            ));
         }
 
         return array_map(fn ($item) => new PrestaShop($item['tag_name']), $versions);

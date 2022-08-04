@@ -14,6 +14,8 @@ use Symfony\Component\Finder\Finder;
 
 class GenerateJsonCommandTest extends AbstractCommandTestCase
 {
+    private const MIN_PRESTASHOP_VERSION = '8.0.0';
+
     private GenerateJsonCommand $command;
 
     public function setUp(): void
@@ -28,11 +30,13 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             $this->createMock(Client::class),
             $githubClient,
             'prestashop/native-modules',
+            self::MIN_PRESTASHOP_VERSION,
             __DIR__ . '/../ressources/modules',
         );
         $prestaShopUtils = new PrestaShopUtils(
             $githubClient,
             $this->createMock(Client::class),
+            self::MIN_PRESTASHOP_VERSION,
             __DIR__ . '/../ressources/prestashop',
         );
 

@@ -31,6 +31,9 @@ class DownloadNativeModuleMainClassesCommand extends Command
             foreach ($versions as $version) {
                 $output->writeln(sprintf('<info>Downloading %s %s</info>', $module, $version->getTag()));
                 $this->moduleUtils->downloadMainClass($module, $version);
+                if ($this->moduleUtils->isModuleCompatibleWithMinPrestaShopVersion($module, $version)) {
+                    break;
+                }
             }
         }
 

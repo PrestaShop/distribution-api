@@ -15,6 +15,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class UpdateModuleConfigFilesCommandTest extends AbstractCommandTestCase
 {
+    private const MIN_PRESTASHOP_VERSION = '8.0.0';
+
     private UpdateModuleConfigFilesCommand $command;
 
     /** @var GithubClient&MockObject */
@@ -31,6 +33,7 @@ class UpdateModuleConfigFilesCommandTest extends AbstractCommandTestCase
             $this->createMock(Client::class),
             $this->githubClient,
             'prestashop/native-modules',
+            self::MIN_PRESTASHOP_VERSION,
             __DIR__ . '/../ressources/modules',
         );
 

@@ -24,18 +24,21 @@ class ModuleUtils
     private GithubClient $githubClient;
     private string $moduleListRepository;
     private string $moduleDir;
+    private string $prestaShopMinVersion;
 
     public function __construct(
         ModuleParser $moduleParser,
         Client $client,
         GithubClient $githubClient,
         string $moduleListRepository,
+        string $prestaShopMinVersion,
         string $moduleDir
     ) {
         $this->parser = $moduleParser;
         $this->client = $client;
         $this->githubClient = $githubClient;
         $this->moduleListRepository = $moduleListRepository;
+        $this->prestaShopMinVersion = $prestaShopMinVersion;
         $this->moduleDir = $moduleDir;
     }
 
@@ -75,6 +78,15 @@ class ModuleUtils
         $response = $this->client->get(sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName));
         file_put_contents($path . '/' . $moduleName . '.php', $response->getBody());
         $this->saveDownloadUrl($moduleName, $version);
+    }
+
+    public function isModuleCompatibleWithMinPrestaShopVersion(string $moduleName, Version $version): bool
+    {
+        $this->setVersionData($moduleName, $version);
+        $this->overrideVersionCompliancyFromYaml(new Module($moduleName, [$version]));
+
+        return $version->getVersionCompliancyMin() !== null
+            && version_compare($version->getVersionCompliancyMin(), $this->prestaShopMinVersion, '<=');
     }
 
     /**
