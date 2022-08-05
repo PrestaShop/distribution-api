@@ -11,6 +11,7 @@ services:
       $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop'
       $moduleListRepository: '%module_list_repository%'
       $prestaShopMinVersion: '%prestashop_min_version%'
+      $publicAssetsBaseUrl: '%public_assets_base_url%'
 
   Symfony\Component\Console\Application:
     public: true
@@ -33,26 +34,28 @@ services:
 
   App\Util\PrestaShopUtils:
 
+  App\Util\PublicDownloadUrlProvider:
+
   App\Command\GenerateJsonCommand:
     tags: ['console.command']
 
   App\Command\UpdateModuleConfigFilesCommand:
-    tags: [ 'console.command' ]
+    tags: ['console.command']
 
   App\Command\DownloadNativeModuleMainClassesCommand:
     tags: ['console.command']
 
-  App\Command\DownloadPrestaShopInstallVersionsCommand:
+  App\Command\DownloadNewPrestaShopReleasesCommand:
     tags: ['console.command']
 
   App\Command\CleanCommand:
     tags: ['console.command']
 
   App\Command\CheckReposCommand:
-    tags: [ 'console.command' ]
+    tags: ['console.command']
 
   App\Command\UploadAssetsCommand:
-    tags: [ 'console.command' ]
+    tags: ['console.command']
 
   App\Command\RunCommand:
-    tags: [ 'console.command' ]
+    tags: ['console.command']

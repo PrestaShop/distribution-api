@@ -6,22 +6,24 @@ namespace App\Util;
 
 use App\Model\Module;
 use App\Model\Version;
+use App\ModuleCollection;
 use Github\Client as GithubClient;
+use Google\Cloud\Storage\Bucket;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
 use Symfony\Component\Yaml\Yaml;
+use ZipArchive;
 
 class ModuleUtils
 {
-    public const DOWNLOAD_URL_FILENAME = 'download_url.txt';
-
     private const PS_VERSION = '_PS_VERSION_';
     private const GITHUB_MAIN_CLASS_ENDPOINT = 'https://raw.githubusercontent.com/PrestaShop/%s/%s/%s.php';
-    private const GITHUB_LOGO_ENDPOINT = 'https://raw.githubusercontent.com/PrestaShop/%s/%s/logo.png';
 
     private ModuleParser $parser;
     private Client $client;
     private GithubClient $githubClient;
+    private Bucket $bucket;
+    private PublicDownloadUrlProvider $publicDownloadUrlProvider;
     private string $moduleListRepository;
     private string $moduleDir;
     private string $prestaShopMinVersion;
@@ -30,6 +32,8 @@ class ModuleUtils
         ModuleParser $moduleParser,
         Client $client,
         GithubClient $githubClient,
+        Bucket $bucket,
+        PublicDownloadUrlProvider $publicDownloadUrlProvider,
         string $moduleListRepository,
         string $prestaShopMinVersion,
         string $moduleDir
@@ -37,14 +41,11 @@ class ModuleUtils
         $this->parser = $moduleParser;
         $this->client = $client;
         $this->githubClient = $githubClient;
+        $this->bucket = $bucket;
+        $this->publicDownloadUrlProvider = $publicDownloadUrlProvider;
         $this->moduleListRepository = $moduleListRepository;
         $this->prestaShopMinVersion = $prestaShopMinVersion;
         $this->moduleDir = $moduleDir;
-    }
-
-    public function getModuleDir(): string
-    {
-        return $this->moduleDir;
     }
 
     /**
@@ -68,6 +69,30 @@ class ModuleUtils
         ), $versions);
     }
 
+    public function getFromBucket(): ModuleCollection
+    {
+        $modules = $this->bucket->objects(['prefix' => 'assets/modules/']);
+        $list = [];
+        foreach ($modules as $module) {
+            $parts = explode('/', $module->info()['name']);
+            if (!isset($list[$parts[count($parts) - 3]])) {
+                $list[$parts[count($parts) - 3]] = [];
+            }
+            $list[$parts[count($parts) - 3]][] = $parts[count($parts) - 2];
+        }
+
+        $tet = [];
+        foreach ($list as $moduleName => $tagNames) {
+            $v = [];
+            foreach ($tagNames as $tagName) {
+                $v[] = new Version($tagName);
+            }
+            $tet[] = new Module($moduleName, $v);
+        }
+
+        return new ModuleCollection(...$tet);
+    }
+
     public function downloadMainClass(string $moduleName, Version $version): void
     {
         $path = join('/', [$this->moduleDir, $moduleName, $version->getTag()]);
@@ -77,7 +102,32 @@ class ModuleUtils
 
         $response = $this->client->get(sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName));
         file_put_contents($path . '/' . $moduleName . '.php', $response->getBody());
-        $this->saveDownloadUrl($moduleName, $version);
+    }
+
+    public function download(string $moduleName, Version $version): void
+    {
+        $path = join('/', [$this->moduleDir, $moduleName, $version->getTag()]);
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $response = $this->client->get($version->getGithubUrl());
+        file_put_contents($path . '/' . $moduleName . '.zip', $response->getBody());
+    }
+
+    public function extractLogo(string $moduleName, Version $version): void
+    {
+        $path = join('/', [$this->moduleDir, $moduleName, $version->getTag(), $moduleName . '.zip']);
+        if (!file_exists($path)) {
+            return;
+        }
+
+        $moduleZip = new ZipArchive();
+        $moduleZip->open($path);
+        $icon = $moduleZip->getFromName($moduleName . '/logo.png');
+        $moduleZip->close();
+
+        file_put_contents(join('/', [$this->moduleDir, $moduleName, $version->getTag(), 'logo.png']), $icon);
     }
 
     public function isModuleCompatibleWithMinPrestaShopVersion(string $moduleName, Version $version): bool
@@ -89,15 +139,12 @@ class ModuleUtils
             && version_compare($version->getVersionCompliancyMin(), $this->prestaShopMinVersion, '<=');
     }
 
-    /**
-     * @return Module[]
-     */
-    public function getLocalModules(): array
+    public function getLocalModules(): ModuleCollection
     {
         $modules = [];
         $exclude = ['.', '..'];
         if (!is_dir($this->moduleDir) || !$modulesScandir = scandir($this->moduleDir)) {
-            return [];
+            return new ModuleCollection();
         }
         foreach ($modulesScandir as $moduleName) {
             if (in_array($moduleName, $exclude) || !is_dir($this->moduleDir . '/' . $moduleName)) {
@@ -111,13 +158,12 @@ class ModuleUtils
                 if (in_array($version, $exclude)) {
                     continue;
                 }
-                $url = $this->getDownloadUrl($moduleName, $version);
-                $module->addVersion(new Version($version, $url));
+                $module->addVersion(new Version($version));
             }
             $modules[] = $module;
         }
 
-        return $modules;
+        return new ModuleCollection(...$modules);
     }
 
     public function setVersionData(string $moduleName, Version $version): void
@@ -132,7 +178,8 @@ class ModuleUtils
             ->setVersionCompliancyMax($info['versionCompliancyMax'] === self::PS_VERSION ? null : $info['versionCompliancyMax'])
             ->setTab($info['tab'] ?? null)
             ->setAuthor($info['author'] ?? null)
-            ->setIcon($this->getLogoUrl($moduleName, $version))
+            ->setDownloadUrl($this->publicDownloadUrlProvider->getModuleDownloadUrl($moduleName, $version))
+            ->setIcon($this->publicDownloadUrlProvider->getModuleIconUrl($moduleName, $version))
             ->setDisplayName($info['displayName'] ?? null)
             ->setDescription($info['description'] ?? null)
         ;
@@ -169,35 +216,5 @@ class ModuleUtils
         $modules = array_filter($files, fn ($item) => str_ends_with($item['name'], '.yml'));
 
         return array_map(fn ($item) => substr($item['name'], 0, -4), $modules);
-    }
-
-    private function saveDownloadUrl(string $moduleName, Version $version): void
-    {
-        $path = $this->getDownloadUrlFilePath($moduleName, $version->getTag());
-        file_put_contents($path, $version->getUrl());
-    }
-
-    private function getDownloadUrl(string $moduleName, string $version): ?string
-    {
-        $path = $this->getDownloadUrlFilePath($moduleName, $version);
-        if (!is_file($path)) {
-            return null;
-        }
-
-        return file_get_contents($path) ?: null;
-    }
-
-    private function getDownloadUrlFilePath(string $moduleName, string $version): string
-    {
-        return join('/', [$this->moduleDir, $moduleName, $version, static::DOWNLOAD_URL_FILENAME]);
-    }
-
-    private function getLogoUrl(string $moduleName, Version $version): string
-    {
-        return sprintf(
-            self::GITHUB_LOGO_ENDPOINT,
-            $moduleName,
-            $version->getTag()
-        );
     }
 }

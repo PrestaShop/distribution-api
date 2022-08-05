@@ -11,7 +11,8 @@ class Version implements JsonSerializable
     private string $tag;
     private ?string $displayName;
     private ?string $icon;
-    private ?string $url;
+    private ?string $githubUrl;
+    private ?string $downloadUrl;
     private ?string $version;
     private ?string $author;
     private ?string $versionCompliancyMin;
@@ -19,10 +20,10 @@ class Version implements JsonSerializable
     private ?string $tab;
     private ?string $description;
 
-    public function __construct(string $tag, string $url = null)
+    public function __construct(string $tag, string $githubUrl = null)
     {
         $this->tag = $tag;
-        $this->url = $url;
+        $this->githubUrl = $githubUrl;
     }
 
     public function getTag(): string
@@ -30,9 +31,21 @@ class Version implements JsonSerializable
         return $this->tag;
     }
 
-    public function getUrl(): ?string
+    public function getGithubUrl(): ?string
     {
-        return $this->url;
+        return $this->githubUrl;
+    }
+
+    public function getDownloadUrl(): ?string
+    {
+        return $this->downloadUrl;
+    }
+
+    public function setDownloadUrl(?string $downloadUrl): static
+    {
+        $this->downloadUrl = $downloadUrl;
+
+        return $this;
     }
 
     public function getDisplayName(): ?string
@@ -141,7 +154,7 @@ class Version implements JsonSerializable
             'version' => $this->getVersion(),
             'prestashop_min_version' => $this->getVersionCompliancyMin(),
             'prestashop_max_version' => $this->getVersionCompliancyMax(),
-            'download_url' => $this->getUrl(),
+            'download_url' => $this->getDownloadUrl(),
             'icon' => $this->getIcon(),
         ];
     }

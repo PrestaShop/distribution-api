@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Exception\FilesystemException;
-use App\Model\Module;
 use App\Model\PrestaShop;
+use App\ModuleCollection;
 use App\Util\ModuleUtils;
 use App\Util\PrestaShopUtils;
 use Symfony\Component\Console\Command\Command;
@@ -15,10 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateJsonCommand extends Command
 {
-    private const CHANNEL_STABLE = 'stable';
-    private const CHANNEL_RC = 'rc';
-    private const CHANNEL_BETA = 'beta';
-
     protected static $defaultName = 'generateJson';
 
     private ModuleUtils $moduleUtils;
@@ -39,14 +35,17 @@ class GenerateJsonCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $modules = $this->moduleUtils->getLocalModules();
-        $prestashopVersions = $this->prestaShopUtils->getLocalVersions();
+        $prestashopVersions = array_merge(
+            $this->prestaShopUtils->getVersionsFromBucket(),
+            $this->prestaShopUtils->getLocalVersions()
+        );
 
         if (empty($modules) || empty($prestashopVersions)) {
             $output->writeln('<error>No module or PrestaShop version found!</error>');
             $output->writeln(sprintf(
                 '<question>Did you run the `%s` and `%s` command?</question>',
                 DownloadNativeModuleMainClassesCommand::getDefaultName(),
-                DownloadPrestaShopInstallVersionsCommand::getDefaultName()
+                DownloadNewPrestaShopReleasesCommand::getDefaultName()
             ));
 
             return static::FAILURE;
@@ -65,16 +64,13 @@ class GenerateJsonCommand extends Command
         $beta = null;
 
         foreach ($prestashopVersions as $prestashopVersion) {
-            $output->writeln(sprintf('<info>Parsing PrestaShop %s</info>', $prestashopVersion->getVersion()));
-            $this->prestaShopUtils->setVersionsCompat($prestashopVersion);
-
-            if ($this->isMoreRecentChannel($stable, $prestashopVersion, self::CHANNEL_STABLE)) {
+            if ($this->isMoreRecentChannel($stable, $prestashopVersion, PrestaShop::CHANNEL_STABLE)) {
                 $stable = $prestashopVersion;
             }
-            if ($this->isMoreRecentChannel($rc, $prestashopVersion, self::CHANNEL_RC)) {
+            if ($this->isMoreRecentChannel($rc, $prestashopVersion, PrestaShop::CHANNEL_RC)) {
                 $rc = $prestashopVersion;
             }
-            if ($this->isMoreRecentChannel($beta, $prestashopVersion, self::CHANNEL_BETA)) {
+            if ($this->isMoreRecentChannel($beta, $prestashopVersion, PrestaShop::CHANNEL_BETA)) {
                 $beta = $prestashopVersion;
             }
         }
@@ -92,11 +88,10 @@ class GenerateJsonCommand extends Command
     }
 
     /**
-     * @param Module[] $modules
      * @param PrestaShop[] $prestashopVersions
      */
     private function generatePrestaShopModulesJson(
-        array $modules,
+        ModuleCollection $modules,
         array $prestashopVersions,
         OutputInterface $output
     ): void {
@@ -185,13 +180,13 @@ class GenerateJsonCommand extends Command
     {
         $isChannel = false;
         switch ($channel) {
-            case self::CHANNEL_STABLE:
+            case PrestaShop::CHANNEL_STABLE:
                 $isChannel = $new->isStable();
                 break;
-            case self::CHANNEL_RC:
+            case PrestaShop::CHANNEL_RC:
                 $isChannel = $new->isRC();
                 break;
-            case self::CHANNEL_BETA:
+            case PrestaShop::CHANNEL_BETA:
                 $isChannel = $new->isBeta();
                 break;
         }

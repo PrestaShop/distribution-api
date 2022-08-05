@@ -13,21 +13,21 @@ class RunCommand extends Command
     protected static $defaultName = 'run';
 
     private DownloadNativeModuleMainClassesCommand $downloadNativeModuleMainClassesCommand;
-    private DownloadPrestaShopInstallVersionsCommand $downloadPrestaShopInstallVersionsCommand;
+    private DownloadNewPrestaShopReleasesCommand $downloadNewPrestaShopReleasesCommand;
     private UpdateModuleConfigFilesCommand $updateModuleConfigFilesCommand;
     private GenerateJsonCommand $generateJsonCommand;
     private UploadAssetsCommand $uploadAssetsCommand;
 
     public function __construct(
         DownloadNativeModuleMainClassesCommand $downloadNativeModuleMainClassesCommand,
-        DownloadPrestaShopInstallVersionsCommand $downloadPrestaShopInstallVersionsCommand,
+        DownloadNewPrestaShopReleasesCommand $downloadPrestaShopInstallVersionsCommand,
         UpdateModuleConfigFilesCommand $updateModuleConfigFilesCommand,
         GenerateJsonCommand $generateJsonCommand,
         UploadAssetsCommand $uploadAssetsCommand
     ) {
         parent::__construct();
         $this->downloadNativeModuleMainClassesCommand = $downloadNativeModuleMainClassesCommand;
-        $this->downloadPrestaShopInstallVersionsCommand = $downloadPrestaShopInstallVersionsCommand;
+        $this->downloadNewPrestaShopReleasesCommand = $downloadPrestaShopInstallVersionsCommand;
         $this->updateModuleConfigFilesCommand = $updateModuleConfigFilesCommand;
         $this->generateJsonCommand = $generateJsonCommand;
         $this->uploadAssetsCommand = $uploadAssetsCommand;
@@ -37,7 +37,7 @@ class RunCommand extends Command
     {
         if (
             $this->downloadNativeModuleMainClassesCommand->execute($input, $output) === self::SUCCESS
-            && $this->downloadPrestaShopInstallVersionsCommand->execute($input, $output) === self::SUCCESS
+            && $this->downloadNewPrestaShopReleasesCommand->execute($input, $output) === self::SUCCESS
             && $this->updateModuleConfigFilesCommand->execute($input, $output) === self::SUCCESS
             && $this->generateJsonCommand->execute($input, $output) === self::SUCCESS
             && $this->uploadAssetsCommand->execute($input, $output) === self::SUCCESS
