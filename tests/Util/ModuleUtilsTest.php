@@ -6,6 +6,8 @@ namespace Tests\Util;
 
 use App\Model\Version;
 use App\Util\ModuleUtils;
+use App\Util\PublicDownloadUrlProvider;
+use Google\Cloud\Storage\Bucket;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
 use Tests\AbstractMockedGithubClientTestCase;
@@ -25,6 +27,8 @@ class ModuleUtilsTest extends AbstractMockedGithubClientTestCase
             new ModuleParser(),
             $this->createMock(Client::class),
             $this->createGithubClientMock(),
+            $this->createMock(Bucket::class),
+            new PublicDownloadUrlProvider(''),
             'PrestaShop/native-modules',
             $minPrestaShopVersion,
             __DIR__ . '/../ressources/modules'

@@ -13,6 +13,7 @@ use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Throwable;
 use ZipArchive;
@@ -49,6 +50,10 @@ class PrestaShopUtils
             mkdir($path, 0777, true);
         }
 
+        if ($prestaShop->getGithubUrl() === null) {
+            throw new RuntimeException(sprintf('Unable to download PrestaShop %s because it has no Github url', $prestaShop->getVersion()));
+        }
+
         $response = $this->client->get($prestaShop->getGithubUrl());
         file_put_contents($path . '/prestashop.zip', $response->getBody());
     }
@@ -82,6 +87,7 @@ class PrestaShopUtils
     public function getVersionsFromBucket(): array
     {
         try {
+            /** @var array<array<string, string>> $prestaShopsJson */
             $prestaShopsJson = json_decode($this->bucket->object('prestashop.json')->downloadAsString(), true) ?: [];
         } catch (Throwable) {
             $prestaShopsJson = [];

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Command;
 
 use App\Command\DownloadNativeModuleMainClassesCommand;
-use App\Command\DownloadPrestaShopInstallVersionsCommand;
+use App\Command\DownloadNewPrestaShopReleasesCommand;
 use App\Command\GenerateJsonCommand;
 use App\Command\RunCommand;
 use App\Command\UpdateModuleConfigFilesCommand;
@@ -20,8 +20,8 @@ class RunCommandTest extends AbstractCommandTestCase
     /** @var DownloadNativeModuleMainClassesCommand&MockObject */
     private $downloadNativeModuleMainClassesCommandMock;
 
-    /** @var DownloadPrestaShopInstallVersionsCommand&MockObject */
-    private $downloadPrestaShopInstallVersionsCommandMock;
+    /** @var DownloadNewPrestaShopReleasesCommand&MockObject */
+    private $downloadNewPrestaShopReleasesCommandMock;
 
     /** @var UpdateModuleConfigFilesCommand&MockObject */
     private $updateModuleConfigFilesCommandMock;
@@ -37,14 +37,14 @@ class RunCommandTest extends AbstractCommandTestCase
         parent::setUp();
 
         $this->downloadNativeModuleMainClassesCommandMock = $this->createMock(DownloadNativeModuleMainClassesCommand::class);
-        $this->downloadPrestaShopInstallVersionsCommandMock = $this->createMock(DownloadPrestaShopInstallVersionsCommand::class);
+        $this->downloadNewPrestaShopReleasesCommandMock = $this->createMock(DownloadNewPrestaShopReleasesCommand::class);
         $this->updateModuleConfigFilesCommandMock = $this->createMock(UpdateModuleConfigFilesCommand::class);
         $this->generateJsonCommandMock = $this->createMock(GenerateJsonCommand::class);
         $this->uploadAssetsCommandMock = $this->createMock(UploadAssetsCommand::class);
 
         $this->command = new RunCommand(
             $this->downloadNativeModuleMainClassesCommandMock,
-            $this->downloadPrestaShopInstallVersionsCommandMock,
+            $this->downloadNewPrestaShopReleasesCommandMock,
             $this->updateModuleConfigFilesCommandMock,
             $this->generateJsonCommandMock,
             $this->uploadAssetsCommandMock
@@ -54,13 +54,13 @@ class RunCommandTest extends AbstractCommandTestCase
     public function testSuccess(): void
     {
         $this->downloadNativeModuleMainClassesCommandMock->method('execute')->willReturn(Command::SUCCESS);
-        $this->downloadPrestaShopInstallVersionsCommandMock->method('execute')->willReturn(Command::SUCCESS);
+        $this->downloadNewPrestaShopReleasesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->updateModuleConfigFilesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->generateJsonCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->uploadAssetsCommandMock->method('execute')->willReturn(Command::SUCCESS);
 
         $this->downloadNativeModuleMainClassesCommandMock->expects($this->once())->method('execute');
-        $this->downloadPrestaShopInstallVersionsCommandMock->expects($this->once())->method('execute');
+        $this->downloadNewPrestaShopReleasesCommandMock->expects($this->once())->method('execute');
         $this->updateModuleConfigFilesCommandMock->expects($this->once())->method('execute');
         $this->generateJsonCommandMock->expects($this->once())->method('execute');
         $this->uploadAssetsCommandMock->expects($this->once())->method('execute');
@@ -70,13 +70,13 @@ class RunCommandTest extends AbstractCommandTestCase
     public function testDownloadNativeModuleMainClassesCommandFail(): void
     {
         $this->downloadNativeModuleMainClassesCommandMock->method('execute')->willReturn(Command::FAILURE);
-        $this->downloadPrestaShopInstallVersionsCommandMock->method('execute')->willReturn(Command::SUCCESS);
+        $this->downloadNewPrestaShopReleasesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->updateModuleConfigFilesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->generateJsonCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->uploadAssetsCommandMock->method('execute')->willReturn(Command::SUCCESS);
 
         $this->downloadNativeModuleMainClassesCommandMock->expects($this->once())->method('execute');
-        $this->downloadPrestaShopInstallVersionsCommandMock->expects($this->never())->method('execute');
+        $this->downloadNewPrestaShopReleasesCommandMock->expects($this->never())->method('execute');
         $this->updateModuleConfigFilesCommandMock->expects($this->never())->method('execute');
         $this->generateJsonCommandMock->expects($this->never())->method('execute');
         $this->uploadAssetsCommandMock->expects($this->never())->method('execute');
@@ -86,13 +86,13 @@ class RunCommandTest extends AbstractCommandTestCase
     public function testDownloadPrestaShopInstallVersionsCommandFail(): void
     {
         $this->downloadNativeModuleMainClassesCommandMock->method('execute')->willReturn(Command::SUCCESS);
-        $this->downloadPrestaShopInstallVersionsCommandMock->method('execute')->willReturn(Command::FAILURE);
+        $this->downloadNewPrestaShopReleasesCommandMock->method('execute')->willReturn(Command::FAILURE);
         $this->updateModuleConfigFilesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->generateJsonCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->uploadAssetsCommandMock->method('execute')->willReturn(Command::SUCCESS);
 
         $this->downloadNativeModuleMainClassesCommandMock->expects($this->once())->method('execute');
-        $this->downloadPrestaShopInstallVersionsCommandMock->expects($this->once())->method('execute');
+        $this->downloadNewPrestaShopReleasesCommandMock->expects($this->once())->method('execute');
         $this->updateModuleConfigFilesCommandMock->expects($this->never())->method('execute');
         $this->generateJsonCommandMock->expects($this->never())->method('execute');
         $this->uploadAssetsCommandMock->expects($this->never())->method('execute');
@@ -102,13 +102,13 @@ class RunCommandTest extends AbstractCommandTestCase
     public function testUpdateModuleConfigFilesCommandFail(): void
     {
         $this->downloadNativeModuleMainClassesCommandMock->method('execute')->willReturn(Command::SUCCESS);
-        $this->downloadPrestaShopInstallVersionsCommandMock->method('execute')->willReturn(Command::SUCCESS);
+        $this->downloadNewPrestaShopReleasesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->updateModuleConfigFilesCommandMock->method('execute')->willReturn(Command::FAILURE);
         $this->generateJsonCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->uploadAssetsCommandMock->method('execute')->willReturn(Command::SUCCESS);
 
         $this->downloadNativeModuleMainClassesCommandMock->expects($this->once())->method('execute');
-        $this->downloadPrestaShopInstallVersionsCommandMock->expects($this->once())->method('execute');
+        $this->downloadNewPrestaShopReleasesCommandMock->expects($this->once())->method('execute');
         $this->updateModuleConfigFilesCommandMock->expects($this->once())->method('execute');
         $this->generateJsonCommandMock->expects($this->never())->method('execute');
         $this->uploadAssetsCommandMock->expects($this->never())->method('execute');
@@ -118,13 +118,13 @@ class RunCommandTest extends AbstractCommandTestCase
     public function testGenerateJsonCommandFail(): void
     {
         $this->downloadNativeModuleMainClassesCommandMock->method('execute')->willReturn(Command::SUCCESS);
-        $this->downloadPrestaShopInstallVersionsCommandMock->method('execute')->willReturn(Command::SUCCESS);
+        $this->downloadNewPrestaShopReleasesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->updateModuleConfigFilesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->generateJsonCommandMock->method('execute')->willReturn(Command::FAILURE);
         $this->uploadAssetsCommandMock->method('execute')->willReturn(Command::SUCCESS);
 
         $this->downloadNativeModuleMainClassesCommandMock->expects($this->once())->method('execute');
-        $this->downloadPrestaShopInstallVersionsCommandMock->expects($this->once())->method('execute');
+        $this->downloadNewPrestaShopReleasesCommandMock->expects($this->once())->method('execute');
         $this->updateModuleConfigFilesCommandMock->expects($this->once())->method('execute');
         $this->generateJsonCommandMock->expects($this->once())->method('execute');
         $this->uploadAssetsCommandMock->expects($this->never())->method('execute');
@@ -134,13 +134,13 @@ class RunCommandTest extends AbstractCommandTestCase
     public function testUploadAssetsCommandFail(): void
     {
         $this->downloadNativeModuleMainClassesCommandMock->method('execute')->willReturn(Command::SUCCESS);
-        $this->downloadPrestaShopInstallVersionsCommandMock->method('execute')->willReturn(Command::SUCCESS);
+        $this->downloadNewPrestaShopReleasesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->updateModuleConfigFilesCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->generateJsonCommandMock->method('execute')->willReturn(Command::SUCCESS);
         $this->uploadAssetsCommandMock->method('execute')->willReturn(Command::FAILURE);
 
         $this->downloadNativeModuleMainClassesCommandMock->expects($this->once())->method('execute');
-        $this->downloadPrestaShopInstallVersionsCommandMock->expects($this->once())->method('execute');
+        $this->downloadNewPrestaShopReleasesCommandMock->expects($this->once())->method('execute');
         $this->updateModuleConfigFilesCommandMock->expects($this->once())->method('execute');
         $this->generateJsonCommandMock->expects($this->once())->method('execute');
         $this->uploadAssetsCommandMock->expects($this->once())->method('execute');

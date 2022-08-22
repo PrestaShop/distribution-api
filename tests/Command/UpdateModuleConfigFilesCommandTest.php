@@ -6,8 +6,10 @@ namespace Tests\Command;
 
 use App\Command\UpdateModuleConfigFilesCommand;
 use App\Util\ModuleUtils;
+use App\Util\PublicDownloadUrlProvider;
 use Github\Api\Repository\Contents;
 use Github\Client as GithubClient;
+use Google\Cloud\Storage\Bucket;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psssst\ModuleParser;
@@ -32,6 +34,8 @@ class UpdateModuleConfigFilesCommandTest extends AbstractCommandTestCase
             new ModuleParser(),
             $this->createMock(Client::class),
             $this->githubClient,
+            $this->createMock(Bucket::class),
+            new PublicDownloadUrlProvider(''),
             'prestashop/native-modules',
             self::MIN_PRESTASHOP_VERSION,
             __DIR__ . '/../ressources/modules',

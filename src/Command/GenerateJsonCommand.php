@@ -40,7 +40,7 @@ class GenerateJsonCommand extends Command
             $this->prestaShopUtils->getLocalVersions()
         );
 
-        if (empty($modules) || empty($prestashopVersions)) {
+        if (count($modules) === 0 || empty($prestashopVersions)) {
             $output->writeln('<error>No module or PrestaShop version found!</error>');
             $output->writeln(sprintf(
                 '<question>Did you run the `%s` and `%s` command?</question>',

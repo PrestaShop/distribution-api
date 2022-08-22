@@ -102,7 +102,7 @@ class PrestaShop implements JsonSerializable
             'php_max_version' => $this->getMaxPhpVersion(),
             'php_min_version' => $this->getMinPhpVersion(),
             'download_url' => $this->getDownloadUrl(),
-            'stability' =>  $this->getStability(),
+            'stability' => $this->getStability(),
         ];
     }
 }

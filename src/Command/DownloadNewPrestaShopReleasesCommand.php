@@ -39,6 +39,7 @@ class DownloadNewPrestaShopReleasesCommand extends Command
 
     /**
      * @param PrestaShop[] $prestaShop
+     *
      * @return PrestaShop[]
      */
     private function removeAlreadyAvailableVersions(array $prestaShop): array

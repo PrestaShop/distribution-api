@@ -11,6 +11,7 @@ use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
+use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use ZipArchive;
 
@@ -109,6 +110,10 @@ class ModuleUtils
         $path = join('/', [$this->moduleDir, $moduleName, $version->getTag()]);
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
+        }
+
+        if ($version->getGithubUrl() === null) {
+            throw new RuntimeException(sprintf('Unable to download %s %s because it has no Github url', $moduleName, $version->getTag()));
         }
 
         $response = $this->client->get($version->getGithubUrl());
