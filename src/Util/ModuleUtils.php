@@ -73,25 +73,35 @@ class ModuleUtils
     public function getFromBucket(): ModuleCollection
     {
         $modules = $this->bucket->objects(['prefix' => 'assets/modules/']);
-        $list = [];
-        foreach ($modules as $module) {
-            $parts = explode('/', $module->info()['name']);
-            if (!isset($list[$parts[count($parts) - 3]])) {
-                $list[$parts[count($parts) - 3]] = [];
+        $list = new ModuleCollection();
+        foreach ($modules as $moduleObject) {
+            $moduleName = $this->getModuleNameFromPath($moduleObject->info()['name']);
+            $module = $list->get($moduleName);
+            if ($module === null) {
+                $module = new Module($moduleName);
+                $list[] = $module;
             }
-            $list[$parts[count($parts) - 3]][] = $parts[count($parts) - 2];
+            $module->addVersion(new Version($this->getModuleVersionFromPath($moduleObject->info()['name'])));
         }
 
-        $tet = [];
-        foreach ($list as $moduleName => $tagNames) {
-            $v = [];
-            foreach ($tagNames as $tagName) {
-                $v[] = new Version($tagName);
-            }
-            $tet[] = new Module($moduleName, $v);
-        }
+        return $list;
+    }
 
-        return new ModuleCollection(...$tet);
+    private function getElementInPath(string $path, int $index): string
+    {
+        return current(array_slice(explode('/', $path), $index, 1)) ?: '';
+    }
+
+    private function getModuleNameFromPath(string $path): string
+    {
+        // name is the third element starting from the end (path/to/{moduleName}/{version}/{moduleName}.zip)
+        return $this->getElementInPath($path, -3);
+    }
+
+    private function getModuleVersionFromPath(string $path): string
+    {
+        // version is the second element starting from the end (path/to/{moduleName}/{version}/{moduleName}.zip)
+        return $this->getElementInPath($path, -2);
     }
 
     public function downloadMainClass(string $moduleName, Version $version): void

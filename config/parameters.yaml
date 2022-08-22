@@ -6,4 +6,4 @@ parameters:
   bucket_name: '%env(BUCKET_NAME)%'
   module_list_repository: 'prestashop/native-modules'
   public_assets_base_url: '%env(PUBLIC_ASSETS_BASE_URL)%'
-  prestashop_min_version: '1.7.8.0-beta' # @toDo: update to 8.0.0-beta when released
+  prestashop_min_version: '8.0.0-beta'

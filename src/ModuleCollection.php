@@ -74,12 +74,16 @@ class ModuleCollection implements Iterator, ArrayAccess, Countable
     }
 
     /**
-     * @param int $offset
+     * @param mixed $offset
      * @param Module $value
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->modules[$offset] = $value;
+        if ($offset === null) {
+            $this->modules[] = $value;
+        } else {
+            $this->modules[$offset] = $value;
+        }
     }
 
     /**
@@ -104,6 +108,17 @@ class ModuleCollection implements Iterator, ArrayAccess, Countable
         }
 
         return false;
+    }
+
+    public function get(string $moduleName): ?Module
+    {
+        foreach ($this->modules as $module) {
+            if ($module->getName() === $moduleName) {
+                return $module;
+            }
+        }
+
+        return null;
     }
 
     public function count(): int
