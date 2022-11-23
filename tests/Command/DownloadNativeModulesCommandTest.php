@@ -33,6 +33,7 @@ class DownloadNativeModulesCommandTest extends AbstractCommandTestCase
         foreach ($modules as $i => $module) {
             foreach ($validVersions[$i] as $validVersion) {
                 $downloadWriteLn[] = [sprintf('<info>Downloading %s %s</info>', $module, $validVersion)];
+                $downloadWriteLn[] = [sprintf('<info>Downloading new version of %s (%s)</info>', $module, $validVersion)];
             }
         }
 
