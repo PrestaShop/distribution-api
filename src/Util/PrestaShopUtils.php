@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Util;
 
+use App\Exception\NoZipAssetException;
 use App\Model\PrestaShop;
 use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
@@ -69,16 +70,53 @@ class PrestaShopUtils
         while (count($results = $releasesApi->all('PrestaShop', 'PrestaShop', ['page' => $page++])) > 0) {
             $versions = array_merge($versions, array_filter(
                 $results,
-                fn ($item) => !empty($item['assets']) && $this->isVersionGreaterThanOrEqualToMin($item['tag_name'])
+                fn ($item) => $this->hasZipAsset($item) && $this->isVersionGreaterThanOrEqualToMin($item['tag_name'])
             ));
         }
 
         return array_map(function ($item): PrestaShop {
             $prestaShop = new PrestaShop($item['tag_name']);
-            $prestaShop->setGithubUrl(current($item['assets'])['browser_download_url']);
+            $prestaShop->setGithubUrl($this->getZipAssetUrl($item));
 
             return $prestaShop;
         }, $versions);
+    }
+
+    /**
+     * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
+     */
+    private function hasZipAsset(array $item): bool
+    {
+        try {
+            $this->getZipAssetUrl($item);
+        } catch (NoZipAssetException) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
+     */
+    private function getZipAssetUrl(array $item): string
+    {
+        $zipName = $this->getZipName($item);
+        foreach ($item['assets'] as $asset) {
+            if ($asset['name'] === $zipName) {
+                return $asset['browser_download_url'];
+            }
+        }
+
+        throw new NoZipAssetException();
+    }
+
+    /**
+     * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
+     */
+    private function getZipName(array $item): string
+    {
+        return sprintf('prestashop_%s.zip', $item['tag_name']);
     }
 
     /**
