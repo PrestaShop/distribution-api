@@ -62,7 +62,7 @@ class UploadAssetsCommand extends Command
         foreach ($prestashopZips as $prestashopZip) {
             $filename = self::PRESTASHOP_ASSETS_PREFIX . substr($prestashopZip->getPathname(), strlen($this->prestaShopDir) + 1);
             $output->writeln(sprintf('<info>Upload file %s</info>', $filename));
-            $this->bucket->upload($prestashopZip->getContents(), ['name' => $filename]);
+            $this->bucket->upload(fopen($prestashopZip->getPathname(), 'r') ?: null, ['name' => $filename]);
         }
     }
 
@@ -75,7 +75,7 @@ class UploadAssetsCommand extends Command
         foreach ($moduleFiles as $moduleFile) {
             $filename = self::MODULE_ASSETS_PREFIX . substr($moduleFile->getPathname(), strlen($this->moduleDir) + 1);
             $output->writeln(sprintf('<info>Upload file %s</info>', $filename));
-            $this->bucket->upload($moduleFile->getContents(), ['name' => $filename]);
+            $this->bucket->upload(fopen($moduleFile->getPathname(), 'r') ?: null, ['name' => $filename]);
         }
     }
 
@@ -96,7 +96,7 @@ class UploadAssetsCommand extends Command
         foreach ($jsonFiles as $jsonFile) {
             $filename = substr($jsonFile->getPathname(), strlen($this->jsonDir) + 1);
             $output->writeln(sprintf('<info>Upload file %s</info>', $filename));
-            $this->bucket->upload($jsonFile->getContents(), ['name' => $filename]);
+            $this->bucket->upload(fopen($jsonFile->getPathname(), 'r') ?: null, ['name' => $filename]);
         }
     }
 }

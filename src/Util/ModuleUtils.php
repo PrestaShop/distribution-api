@@ -111,7 +111,7 @@ class ModuleUtils
             mkdir($path, 0777, true);
         }
 
-        $response = $this->client->get(sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName));
+        $response = $this->client->get(sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName), ['stream' => true]);
         file_put_contents($path . '/' . $moduleName . '.php', $response->getBody());
     }
 
@@ -126,7 +126,7 @@ class ModuleUtils
             throw new RuntimeException(sprintf('Unable to download %s %s because it has no Github url', $moduleName, $version->getTag()));
         }
 
-        $response = $this->client->get($version->getGithubUrl());
+        $response = $this->client->get($version->getGithubUrl(), ['stream' => true]);
         file_put_contents($path . '/' . $moduleName . '.zip', $response->getBody());
     }
 
