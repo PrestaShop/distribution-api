@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Util;
 
-use App\Exception\NoZipAssetException;
+use App\Exception\NoAssetException;
 use App\Model\PrestaShop;
 use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
@@ -51,12 +51,17 @@ class PrestaShopUtils
             mkdir($path, 0777, true);
         }
 
-        if ($prestaShop->getGithubUrl() === null) {
-            throw new RuntimeException(sprintf('Unable to download PrestaShop %s because it has no Github url', $prestaShop->getVersion()));
+        if ($prestaShop->getGithubZipUrl() === null) {
+            throw new RuntimeException(sprintf('Unable to download PrestaShop %s zip because it has no Github url', $prestaShop->getVersion()));
         }
 
-        $response = $this->client->get($prestaShop->getGithubUrl());
+        $response = $this->client->get($prestaShop->getGithubZipUrl());
         file_put_contents($path . '/prestashop.zip', $response->getBody());
+
+        if ($prestaShop->getGithubXmlUrl() !== null) {
+            $response = $this->client->get($prestaShop->getGithubXmlUrl());
+            file_put_contents($path . '/prestashop.xml', $response->getBody());
+        }
     }
 
     /**
@@ -76,7 +81,11 @@ class PrestaShopUtils
 
         return array_map(function ($item): PrestaShop {
             $prestaShop = new PrestaShop($item['tag_name']);
-            $prestaShop->setGithubUrl($this->getZipAssetUrl($item));
+            $prestaShop->setGithubZipUrl($this->getZipAssetUrl($item));
+            try {
+                $prestaShop->setGithubXmlUrl($this->getXmlAssetUrl($item));
+            } catch (NoAssetException) {
+            }
 
             return $prestaShop;
         }, $versions);
@@ -89,7 +98,7 @@ class PrestaShopUtils
     {
         try {
             $this->getZipAssetUrl($item);
-        } catch (NoZipAssetException) {
+        } catch (NoAssetException) {
             return false;
         }
 
@@ -108,7 +117,22 @@ class PrestaShopUtils
             }
         }
 
-        throw new NoZipAssetException();
+        throw new NoAssetException('No zip asset found', NoAssetException::NO_ZIP_ASSET);
+    }
+
+    /**
+     * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
+     */
+    private function getXmlAssetUrl(array $item): string
+    {
+        $zipName = $this->getXmlName($item);
+        foreach ($item['assets'] as $asset) {
+            if ($asset['name'] === $zipName) {
+                return $asset['browser_download_url'];
+            }
+        }
+
+        throw new NoAssetException('No xml asset found', NoAssetException::NO_XML_ASSET);
     }
 
     /**
@@ -117,6 +141,14 @@ class PrestaShopUtils
     private function getZipName(array $item): string
     {
         return sprintf('prestashop_%s.zip', $item['tag_name']);
+    }
+
+    /**
+     * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
+     */
+    private function getXmlName(array $item): string
+    {
+        return sprintf('prestashop_%s.xml', $item['tag_name']);
     }
 
     /**
@@ -136,10 +168,15 @@ class PrestaShopUtils
             if (!$this->isVersionGreaterThanOrEqualToMin($prestaShopJson['version'])) {
                 continue;
             }
+            if (empty($prestaShopJson['xml_download_url']) || empty($prestaShopJson['zip_md5'])) {
+                continue;
+            }
             $prestashop = new PrestaShop($prestaShopJson['version']);
             $prestashop->setMaxPhpVersion($prestaShopJson['php_max_version']);
             $prestashop->setMinPhpVersion($prestaShopJson['php_min_version']);
-            $prestashop->setDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopDownloadUrl($prestaShopJson['version']));
+            $prestashop->setZipMD5($prestaShopJson['zip_md5']);
+            $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopJson['version']));
+            $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopJson['version']));
             $prestaShops[] = $prestashop;
         }
 
@@ -160,9 +197,17 @@ class PrestaShopUtils
             if (in_array($prestaShopVersion, $exclude) || !is_dir($this->prestaShopDir . '/' . $prestaShopVersion)) {
                 continue;
             }
+            $versionPath = $this->prestaShopDir . '/' . $prestaShopVersion;
+            if (!is_file($versionPath . '/prestashop.zip')) {
+                continue;
+            }
             $prestashop = new PrestaShop($prestaShopVersion);
             $this->setVersionsCompat($prestashop);
-            $prestashop->setDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopDownloadUrl($prestaShopVersion));
+            $prestashop->setZipMD5(md5_file($versionPath . '/prestashop.zip') ?: null);
+            $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopVersion));
+            if (is_file($versionPath . '/prestashop.xml')) {
+                $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopVersion));
+            }
             $versions[] = $prestashop;
         }
 

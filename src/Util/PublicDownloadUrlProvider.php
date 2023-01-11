@@ -15,9 +15,14 @@ class PublicDownloadUrlProvider
         $this->baseUrl = $publicAssetsBaseUrl;
     }
 
-    public function getPrestaShopDownloadUrl(string $version): string
+    public function getPrestaShopZipDownloadUrl(string $version): string
     {
         return $this->baseUrl . '/assets/prestashop/' . $version . '/prestashop.zip';
+    }
+
+    public function getPrestaShopXmlDownloadUrl(string $version): string
+    {
+        return $this->baseUrl . '/assets/prestashop/' . $version . '/prestashop.xml';
     }
 
     public function getModuleDownloadUrl(string $moduleName, Version $version): string

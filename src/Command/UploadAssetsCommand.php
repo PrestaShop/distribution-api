@@ -49,9 +49,9 @@ class UploadAssetsCommand extends Command
 
         $finder = new Finder();
         $finder->sortByName();
-        $prestashopZips = $finder->in($this->prestaShopDir)->files()->name('prestashop.zip');
+        $prestashopZips = $finder->in($this->prestaShopDir)->files()->name(['prestashop.zip', 'prestashop.xml']);
 
-        $output->writeln(sprintf('<info>%s new PrestaShop archive(s) to upload.</info>', $prestashopZips->count()));
+        $output->writeln(sprintf('<info>%s new PrestaShop xml/archive(s) to upload.</info>', $prestashopZips->count()));
         if ($prestashopZips->count() === 0) {
             $output->writeln(sprintf(
                 '<question>Did you run the `%s` command?</question>',

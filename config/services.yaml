@@ -30,32 +30,9 @@ services:
 
   Psssst\ModuleParser:
 
-  App\Util\ModuleUtils:
+  App\Util\:
+    resource: '../src/Util/*'
 
-  App\Util\PrestaShopUtils:
-
-  App\Util\PublicDownloadUrlProvider:
-
-  App\Command\GenerateJsonCommand:
-    tags: ['console.command']
-
-  App\Command\UpdateModuleConfigFilesCommand:
-    tags: ['console.command']
-
-  App\Command\DownloadNativeModuleMainClassesCommand:
-    tags: ['console.command']
-
-  App\Command\DownloadNewPrestaShopReleasesCommand:
-    tags: ['console.command']
-
-  App\Command\CleanCommand:
-    tags: ['console.command']
-
-  App\Command\CheckReposCommand:
-    tags: ['console.command']
-
-  App\Command\UploadAssetsCommand:
-    tags: ['console.command']
-
-  App\Command\RunCommand:
+  App\Command\:
+    resource: '../src/Command/*'
     tags: ['console.command']
