@@ -35,6 +35,7 @@ class UploadAssetsCommandTest extends AbstractCommandTestCase
             [$this->anything(), ['name' => 'assets/prestashop/1.7.7.8/prestashop.zip']],
             [$this->anything(), ['name' => 'assets/prestashop/1.7.8.0-beta.1/prestashop.zip']],
             [$this->anything(), ['name' => 'assets/prestashop/1.7.8.0-rc.1/prestashop.zip']],
+            [$this->anything(), ['name' => 'assets/prestashop/1.7.8.1/prestashop.xml']],
             [$this->anything(), ['name' => 'assets/prestashop/1.7.8.1/prestashop.zip']],
             [$this->anything(), ['name' => 'assets/modules/psgdpr/v1.3.0/logo.png']],
             [$this->anything(), ['name' => 'assets/modules/psgdpr/v1.3.0/psgdpr.zip']],

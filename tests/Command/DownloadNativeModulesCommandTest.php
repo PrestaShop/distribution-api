@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Command;
 
-use App\Command\DownloadNativeModuleMainClassesCommand;
+use App\Command\DownloadNativeModuleFilesCommand;
 use App\Model\Version;
 use App\Util\ModuleUtils;
 
 class DownloadNativeModulesCommandTest extends AbstractCommandTestCase
 {
-    private DownloadNativeModuleMainClassesCommand $command;
+    private DownloadNativeModuleFilesCommand $command;
     private ModuleUtils $moduleUtils;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->moduleUtils = $this->createMock(ModuleUtils::class);
-        $this->command = new DownloadNativeModuleMainClassesCommand($this->moduleUtils);
+        $this->command = new DownloadNativeModuleFilesCommand($this->moduleUtils);
     }
 
     /**
