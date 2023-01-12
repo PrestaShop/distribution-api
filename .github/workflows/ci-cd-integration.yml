@@ -28,10 +28,19 @@ jobs:
       - name: Configure gcloud 👷
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev
 
+      - name: Get tag
+        shell: bash
+        id: get_tag
+        run: echo ::set-output name=TAG::$PREFIX_TAG$(echo $GITHUB_REF | cut -d / -f 3)
+        env:
+          PREFIX_TAG: ${{ inputs.prefix-tag }}
+
       - name: Build and publish Dockerfile 📦
         run: |
           docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" .
+          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${TAG}" .
           docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest
+          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${TAG}
 
       - name: Trigger deploy 🚀
         uses: aurelien-baudet/workflow-dispatch@v2
