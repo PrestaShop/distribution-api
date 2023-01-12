@@ -4,7 +4,7 @@ COPY . /app/
 
 RUN composer install --no-dev -o
 
-FROM php:8.0-alpine
+FROM php:8.1-alpine
 
 RUN apk add --no-cache libzip-dev && docker-php-ext-install zip
 

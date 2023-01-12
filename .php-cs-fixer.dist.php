@@ -31,4 +31,5 @@ return $config->setRules([
     'self_accessor' => false,
     'yoda_style' => false,
     'no_superfluous_phpdoc_tags' => false,
+    'global_namespace_import' => true,
 ])->setFinder($finder);

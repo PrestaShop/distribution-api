@@ -89,7 +89,7 @@ class ModuleCollection implements Iterator, ArrayAccess, Countable
     /**
      * @param int $offset
      */
-    public function offsetUnset(mixed $offset)
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->modules[$offset]);
     }

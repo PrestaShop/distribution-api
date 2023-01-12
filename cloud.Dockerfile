@@ -4,7 +4,7 @@ COPY . /app/
 
 RUN composer install --no-dev -o
 
-FROM php:8.0-apache
+FROM php:8.1-apache
 
 RUN apt-get update && apt-get install -y libzip-dev && docker-php-ext-install zip
 
