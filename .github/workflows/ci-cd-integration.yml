@@ -18,12 +18,14 @@ jobs:
       - name: Checkout the repository 🎁
         uses: actions/checkout@v2
 
-      - name: Setting up google Cloud SDK 💳
-        uses: google-github-actions/setup-gcloud@v0
+      - name: 'Authenticating to GCP ⚙️'
+        uses: google-github-actions/auth@v1
         with:
           project_id: core-oss-integration
-          service_account_key: ${{ secrets.G_CREDENTIALS_INTEGRATION }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.G_CREDENTIALS_INTEGRATION }}
+
+      - name: 'Setting up Cloud SDK 💳'
+        uses: 'google-github-actions/setup-gcloud@v1'
 
       - name: Configure gcloud 👷
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev
