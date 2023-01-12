@@ -37,10 +37,12 @@ jobs:
 
       - name: Build and publish Dockerfile 📦
         run: |
-          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" .
-          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}" .
+          docker build -f cloud.Dockerfile \
+           --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" \
+#           --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}" .
+           --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${GITHUB_SHA::7}" .
           docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest
-          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}
+          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${GITHUB_SHA::7}
 
       - name: Trigger deploy 🚀
         uses: aurelien-baudet/workflow-dispatch@v2
