@@ -34,7 +34,7 @@ jobs:
         shell: bash
         id: get_tag
 #        run: echo "TAG=$TAG$(echo $GITHUB_REF | cut -d / -f 3)" >> $GITHUB_OUTPUT
-        run: echo "TAG=$TAG(${GITHUB_SHA::7})" >> $GITHUB_OUTPUT
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Build and publish Dockerfile 📦
         run: |
