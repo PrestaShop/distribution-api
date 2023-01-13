@@ -51,4 +51,4 @@ jobs:
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
           token: ${{ secrets.ACCESS_TOKEN_INTEGRATION }}
           ref: 'refs/heads/main'
-          inputs: '{ "version": ${{ steps.get_tag.outputs.TAG }} }'
+          inputs: '{ "version": "${{ steps.get_tag.outputs.TAG }}" }'
