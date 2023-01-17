@@ -28,10 +28,18 @@ jobs:
       - name: Configure gcloud 👷
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev
 
+      - name: Get tag
+        shell: bash
+        id: get_tag
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
       - name: Build and publish Dockerfile 📦
         run: |
-          docker build -f cloud.Dockerfile --tag="europe-west1-docker.pkg.dev/core-oss-preproduction/distribution-api/distribution-api:latest" .
+          docker build -f cloud.Dockerfile \
+            --tag="europe-west1-docker.pkg.dev/core-oss-preproduction/distribution-api/distribution-api:latest" \
+            --tag="europe-west1-docker.pkg.dev/core-oss-preproduction/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}" .
           docker push europe-west1-docker.pkg.dev/core-oss-preproduction/distribution-api/distribution-api:latest
+          docker push europe-west1-docker.pkg.dev/core-oss-preproduction/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}
 
       - name: Trigger deploy 🚀
         uses: aurelien-baudet/workflow-dispatch@v2
@@ -40,3 +48,4 @@ jobs:
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
           token: ${{ secrets.ACCESS_TOKEN_PREPRODUCTION }}
           ref: 'refs/heads/main'
+          inputs: '{ "version": "${{ steps.get_tag.outputs.TAG }}" }'

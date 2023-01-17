@@ -33,15 +33,15 @@ jobs:
       - name: Get tag
         shell: bash
         id: get_tag
-        run: echo "TAG=$TAG$(echo $GITHUB_REF | cut -d / -f 3)" >> $GITHUB_OUTPUT
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Build and publish Dockerfile 📦
         run: |
           docker build -f cloud.Dockerfile \
           --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" \
-          --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${GITHUB_SHA::7}" .
+          --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}" .
           docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest
-          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${GITHUB_SHA::7}
+          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}
 
       - name: Trigger deploy 🚀
         uses: aurelien-baudet/workflow-dispatch@v2
@@ -50,4 +50,4 @@ jobs:
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
           token: ${{ secrets.ACCESS_TOKEN_INTEGRATION }}
           ref: 'refs/heads/main'
-          inputs: "{ "version": "${GITHUB_SHA::7}" }"
+          inputs: '{ "version": "${{ steps.get_tag.outputs.TAG }}" }'
