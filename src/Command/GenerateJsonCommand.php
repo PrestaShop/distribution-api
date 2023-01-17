@@ -35,9 +35,11 @@ class GenerateJsonCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $modules = $this->moduleUtils->getLocalModules();
-        $prestashopVersions = array_merge(
-            $this->prestaShopUtils->getVersionsFromBucket(),
-            $this->prestaShopUtils->getLocalVersions()
+        $prestashopVersions = $this->prestaShopUtils->getLocalVersions() + $this->prestaShopUtils->getVersionsFromBucket();
+        // Remove duplicates by comparing the version
+        $prestashopVersions = array_intersect_key(
+            $prestashopVersions,
+            array_unique(array_map(fn ($item) => $item->getVersion(), $prestashopVersions))
         );
 
         if (count($modules) === 0 || empty($prestashopVersions)) {
