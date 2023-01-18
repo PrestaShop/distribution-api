@@ -45,6 +45,12 @@ class GenerateJsonCommand extends Command
             array_unique(array_map(fn ($item) => $item->getVersion(), $prestashopVersions))
         );
 
+        // order form the most recent to the oldest
+        usort(
+            $prestashopVersions,
+            fn (PrestaShop $item1, PrestaShop $item2) => version_compare($item2->getVersion(), $item1->getVersion())
+        );
+
         if (count($modules) === 0 || empty($prestashopVersions)) {
             $output->writeln('<error>No module or PrestaShop version found!</error>');
             $output->writeln(sprintf(

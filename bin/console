@@ -3,10 +3,12 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use App\Console\SavedConsoleOutput;
 use App\DependencyInjection\ApplicationCompilerPass;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -29,4 +31,20 @@ if (!$containerCache->isFresh()) {
 require_once $containerFile;
 $container = new CachedContainer();
 
-$container->get(Application::class)->run();
+$output = new SavedConsoleOutput();
+
+/** @var Application $application */
+$application = $container->get(Application::class);
+
+$application->setCatchExceptions(false);
+set_exception_handler(function($exception) use ($application, $output) {
+    if ($output instanceof SavedConsoleOutput) {
+        // Output history to stderr, so we can see everything on cloud run
+        $output->writeln('', OutputInterface::VERBOSITY_QUIET);
+        $output->getErrorOutput()->writeln('<comment>History of the console output:</comment>');
+        $output->getErrorOutput()->write($output->getMessages());
+    }
+    $application->renderThrowable($exception, $output->getErrorOutput());
+});
+
+$application->run(null, $output);
