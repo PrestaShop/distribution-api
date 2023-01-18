@@ -35,7 +35,10 @@ class GenerateJsonCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $modules = $this->moduleUtils->getLocalModules();
-        $prestashopVersions = $this->prestaShopUtils->getLocalVersions() + $this->prestaShopUtils->getVersionsFromBucket();
+        $prestashopVersions = array_merge(
+            $this->prestaShopUtils->getLocalVersions(),
+            $this->prestaShopUtils->getVersionsFromBucket()
+        );
         // Remove duplicates by comparing the version
         $prestashopVersions = array_intersect_key(
             $prestashopVersions,
@@ -46,7 +49,7 @@ class GenerateJsonCommand extends Command
             $output->writeln('<error>No module or PrestaShop version found!</error>');
             $output->writeln(sprintf(
                 '<question>Did you run the `%s` and `%s` command?</question>',
-                DownloadNativeModuleMainClassesCommand::getDefaultName(),
+                DownloadNativeModuleFilesCommand::getDefaultName(),
                 DownloadNewPrestaShopReleasesCommand::getDefaultName()
             ));
 

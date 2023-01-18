@@ -18,15 +18,17 @@ You should have 3 environment variables defined:
 
 #### Download the module's main files
 ```shell
-$ ./bin/console downloadNativeModuleMainClasses
+$ ./bin/console downloadNativeModuleFiles
 ```
-This will download only the main file of the module so the app can extract the module's version and the PrestaShop versions compliance
+This will download the main file of the module so the app can extract the module's version and the PrestaShop versions compliance.
+It will also download the zip release of the module if it isn't already in the GCP bucket, so it can be added later by the command `uploadAssets`
 
-#### Download PrestaShop's `install/install_version.php` files
+#### Download PrestaShop's releases
 ```shell
-$ ./bin/console downloadPrestaShopInstallVersions
+$ ./bin/console downloadNewPrestaShopReleases
 ```
-This will download the file `install/install_version.php` so the app can extract the PHP version compatibilities
+This will download PrestaShop's zip release and the associated xml file so the app can extract the PHP version compatibilities.
+(Only releases that are not already in the GCP bucket, or having incomplete associated json file (missing xml file for instance) are downloaded).
 
 #### Update modules' config file
 ```shell
@@ -44,22 +46,11 @@ This will generate the different json files to be publicly exposed in the `publi
 ```shell
 $ ./bin/console uploadAssets
 ```
-This will upload the generated json files to the GCP bucket
-
-#### Everything together
-```shell
-$ ./bin/console run
-```
-This will execute the 5 previous commands:
-- `downloadNativeModuleMainClasses`
-- `downloadPrestaShopInstallVersions`
-- `updateModuleConfigFiles`
-- `generateJson`
-- `uploadAssets`
+This will upload the generated json files as well as the new PrestaShop and module's releases to the GCP bucket
 
 ### Utility commands
 
-#### Check that there is no error on the module's repositories:
+#### Check that there is no error on the PrestaShop & module's repositories:
 ```shell
 $ ./bin/console checkRepos
 ```
@@ -68,6 +59,18 @@ $ ./bin/console checkRepos
 ```shell
 $ ./bin/console clean all|json|modules|prestashop
 ```
+
+### Everything together
+```shell
+$ ./bin/console run
+```
+This will execute the 6 following commands:
+- `clean all`
+- `downloadNativeModuleFiles`
+- `downloadNewPrestaShopReleases`
+- `updateModuleConfigFiles`
+- `generateJson`
+- `uploadAssets`
 
 ### Docker
 

@@ -15,8 +15,11 @@ class PrestaShop implements JsonSerializable
     private string $version;
     private ?string $minPhpVersion = null;
     private ?string $maxPhpVersion = null;
-    private ?string $githubUrl = null;
-    private ?string $downloadUrl = null;
+    private ?string $githubZipUrl = null;
+    private ?string $githubXmlUrl = null;
+    private ?string $zipDownloadUrl = null;
+    private ?string $xmlDownloadUrl = null;
+    private ?string $zipMD5 = null;
 
     public function __construct(string $version)
     {
@@ -48,24 +51,54 @@ class PrestaShop implements JsonSerializable
         $this->maxPhpVersion = $maxPhpVersion;
     }
 
-    public function getGithubUrl(): ?string
+    public function getGithubZipUrl(): ?string
     {
-        return $this->githubUrl;
+        return $this->githubZipUrl;
     }
 
-    public function setGithubUrl(?string $githubUrl): void
+    public function setGithubZipUrl(?string $githubZipUrl): void
     {
-        $this->githubUrl = $githubUrl;
+        $this->githubZipUrl = $githubZipUrl;
     }
 
-    public function getDownloadUrl(): ?string
+    public function getGithubXmlUrl(): ?string
     {
-        return $this->downloadUrl;
+        return $this->githubXmlUrl;
     }
 
-    public function setDownloadUrl(?string $downloadUrl): void
+    public function setGithubXmlUrl(?string $githubXmlUrl): void
     {
-        $this->downloadUrl = $downloadUrl;
+        $this->githubXmlUrl = $githubXmlUrl;
+    }
+
+    public function getZipDownloadUrl(): ?string
+    {
+        return $this->zipDownloadUrl;
+    }
+
+    public function setZipDownloadUrl(?string $zipDownloadUrl): void
+    {
+        $this->zipDownloadUrl = $zipDownloadUrl;
+    }
+
+    public function getXmlDownloadUrl(): ?string
+    {
+        return $this->xmlDownloadUrl;
+    }
+
+    public function setXmlDownloadUrl(?string $xmlDownloadUrl): void
+    {
+        $this->xmlDownloadUrl = $xmlDownloadUrl;
+    }
+
+    public function getZipMD5(): ?string
+    {
+        return $this->zipMD5;
+    }
+
+    public function setZipMD5(?string $zipMD5): void
+    {
+        $this->zipMD5 = $zipMD5;
     }
 
     public function isStable(): bool
@@ -101,7 +134,9 @@ class PrestaShop implements JsonSerializable
             'version' => $this->getVersion(),
             'php_max_version' => $this->getMaxPhpVersion(),
             'php_min_version' => $this->getMinPhpVersion(),
-            'download_url' => $this->getDownloadUrl(),
+            'zip_download_url' => $this->getZipDownloadUrl(),
+            'zip_md5' => $this->getZipMD5(),
+            'xml_download_url' => $this->getXmlDownloadUrl(),
             'stability' => $this->getStability(),
         ];
     }
