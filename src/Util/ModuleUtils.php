@@ -60,7 +60,7 @@ class ModuleUtils
         while (count($results = $releasesApi->all('PrestaShop', $moduleName, ['page' => $page++])) > 0) {
             $versions = array_merge(
                 $versions,
-                array_filter($results, fn ($item) => (!empty($item['assets'] || !$withAssetOnly) && !$item['draft']))
+                array_filter($results, fn ($item) => (!empty($item['assets'] || !$withAssetOnly) && (!$item['draft'] && !$item['prerelease'])))
             );
         }
 
@@ -227,7 +227,6 @@ class ModuleUtils
 
         /** @var array<string, array<string, string>> $files */
         $files = $this->githubClient->repository()->contents()->show($username, $repository);
-
         $modules = array_filter($files, fn ($item) => str_ends_with($item['name'], '.yml'));
 
         return array_map(fn ($item) => substr($item['name'], 0, -4), $modules);
