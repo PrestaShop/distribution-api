@@ -110,4 +110,7 @@ Being on github we'll use the github workflow as follow:
 
 ![alt text](pics/workflow.png "Github Workflow")
 
-
+As you can see from the schema above
+- add the label "integration-deployment" to a Pull Request to trigger the deployment of the integration environment and be able to test it
+- merge a Pull Request against branch `main` to trigger the deployment of the preprod environment and be able to test it
+- publish a GitHub release to trigger the deployment of the production environment
