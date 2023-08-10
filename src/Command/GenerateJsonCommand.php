@@ -39,6 +39,8 @@ class GenerateJsonCommand extends Command
             $this->prestaShopUtils->getLocalVersions(),
             $this->prestaShopUtils->getVersionsFromBucket()
         );
+        $devVersion = new PrestaShop('9.0.0');
+        $prestashopVersions[] = $devVersion;
         // Remove duplicates by comparing the version
         $prestashopVersions = array_intersect_key(
             $prestashopVersions,
