@@ -107,6 +107,17 @@ class GenerateJsonCommand extends Command
         OutputInterface $output
     ): void {
         $infos = [];
+        // Add current development version so that its module's list is available, but only if it is not part of the released ones.
+        $developmentVersion = '9.0.0';
+        $addDevelopmentVersion = true;
+        foreach ($prestashopVersions as $prestashopVersion) {
+            if ($prestashopVersion->getVersion() === $developmentVersion) {
+                $addDevelopmentVersion = false;
+            }
+        }
+        if ($addDevelopmentVersion) {
+            $prestashopVersions[] = new PrestaShop($developmentVersion);
+        }
         foreach ($prestashopVersions as $prestashopVersion) {
             $infos[$prestashopVersion->getVersion()] = [];
             foreach ($modules as $module) {
