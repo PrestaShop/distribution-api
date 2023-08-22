@@ -9,6 +9,7 @@
 ## Usage
 
 ### Requirements
+
 You should have 3 environment variables defined:
 - `TOKEN` - The Github token required to use the Github API
 - `GOOGLE_APPLICATION_CREDENTIALS` - Path to the json file previously downloaded containing the authentication information to use GCP
