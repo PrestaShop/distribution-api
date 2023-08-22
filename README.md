@@ -95,7 +95,7 @@ Returns the latest version of the specified channel<br>
 There are 3 targeted environment at the moment:
 
 * **Integration**: integration-api.prestashop-project.org
-* **Préproduction**: preprod-api.prestashop-project.org
+* **Preproduction**: preprod-api.prestashop-project.org
 * **Production**: api.prestashop-project.org
 
 Those edge URLs are hosted at the Cloudflare level, proxyfying the origin GCP Storage.
