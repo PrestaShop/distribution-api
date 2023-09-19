@@ -107,17 +107,8 @@ class GenerateJsonCommand extends Command
         OutputInterface $output
     ): void {
         $infos = [];
-        // Add current development version so that its module's list is available, but only if it is not part of the released ones.
-        $developmentVersion = '9.0.0';
-        $addDevelopmentVersion = true;
-        foreach ($prestashopVersions as $prestashopVersion) {
-            if ($prestashopVersion->getVersion() === $developmentVersion) {
-                $addDevelopmentVersion = false;
-            }
-        }
-        if ($addDevelopmentVersion) {
-            $prestashopVersions[] = new PrestaShop($developmentVersion);
-        }
+
+        $prestashopVersions = $this->addVersionsUnderDelopment($prestashopVersions);
         foreach ($prestashopVersions as $prestashopVersion) {
             $infos[$prestashopVersion->getVersion()] = [];
             foreach ($modules as $module) {
@@ -156,6 +147,42 @@ class GenerateJsonCommand extends Command
                 throw new FilesystemException(sprintf('Failed to write file "%s"', $filename));
             }
         }
+    }
+
+    /**
+     * We only add the versions under development for the modules API so that the automatic tests do not fail because no list of modules is available
+     *
+     * @param PrestaShop[] $prestashopVersions
+     *
+     * @return PrestaShop[]
+     */
+    private function addVersionsUnderDelopment(array $prestashopVersions): array
+    {
+        // Add current development version so that its module's list is available, but only if it is not part of the released ones.
+        $developmentVersion = '9.0.0';
+        $nextPatchVersion = '8.1.2';
+
+        // Check if versions are already in the list
+        $addDevelopmentVersion = true;
+        $addPatchVersion = true;
+        foreach ($prestashopVersions as $prestashopVersion) {
+            if ($prestashopVersion->getVersion() === $developmentVersion) {
+                $addDevelopmentVersion = false;
+            }
+            if ($prestashopVersion->getVersion() === $nextPatchVersion) {
+                $addPatchVersion = false;
+            }
+        }
+
+        // Now add versions if needed
+        if ($addPatchVersion) {
+            $prestashopVersions[] = new PrestaShop($nextPatchVersion);
+        }
+        if ($addDevelopmentVersion) {
+            $prestashopVersions[] = new PrestaShop($developmentVersion);
+        }
+
+        return $prestashopVersions;
     }
 
     /**
