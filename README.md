@@ -114,3 +114,9 @@ As you can see from the schema above
 - add the label "integration-deployment" to a Pull Request to trigger the deployment of the integration environment and be able to test it
 - merge a Pull Request against branch `main` to trigger the deployment of the preprod environment and be able to test it
 - publish a GitHub release to trigger the deployment of the production environment
+
+### Warning about CI
+
+The `integration-deployment` label, when added to a Pull Request, will run the Integration Workflow which relies on [GitHub secrets](https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions). These secrets are not available for forks, which means if you add the `integration-deployment` label to a Pull Request whose branch is on a fork, it will fail.
+
+If you wish to test a Pull Request using the `integration-deployment` label, the branch must be on the upstream repository.
