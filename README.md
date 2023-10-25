@@ -14,6 +14,10 @@ You should have 3 environment variables defined:
 - `GOOGLE_APPLICATION_CREDENTIALS` - Path to the json file previously downloaded containing the authentication information to use GCP
 - `BUCKET_NAME` - The name of the bucket where json files should be uploaded
 
+### Troubleshooting
+
+- If you get a `Bad credentials` error thrown from `GithubExceptionThrower.php` even if your token is correctly configured in parameters.yml, delete the cache folder, in the terminal you can type: `rm -rf var/cache` from the root of the project.
+
 ### Main commands
 
 #### Download the module's main files
