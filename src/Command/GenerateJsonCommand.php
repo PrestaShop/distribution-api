@@ -160,7 +160,7 @@ class GenerateJsonCommand extends Command
     {
         // Add current development version so that its module's list is available, but only if it is not part of the released ones.
         $developmentVersion = '9.0.0';
-        $nextPatchVersion = '8.1.3';
+        $nextPatchVersion = '8.1.4';
 
         // Check if versions are already in the list
         $addDevelopmentVersion = true;
