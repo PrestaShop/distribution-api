@@ -9,12 +9,15 @@ use App\Model\PrestaShop;
 use App\ModuleCollection;
 use App\Util\ModuleUtils;
 use App\Util\PrestaShopUtils;
+use App\Util\VersionUtils;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateJsonCommand extends Command
 {
+    private const MIN_PRESTASHOP_VERSION = '8.0.0';
+
     protected static $defaultName = 'generateJson';
 
     private ModuleUtils $moduleUtils;
@@ -156,29 +159,48 @@ class GenerateJsonCommand extends Command
      *
      * @return PrestaShop[]
      */
-    private function addVersionsUnderDelopment(array $prestashopVersions): array
+    public function addVersionsUnderDelopment(array $prestashopVersions): array
     {
-        // Add current development version so that its module's list is available, but only if it is not part of the released ones.
-        $developmentVersion = '9.0.0';
-        $nextPatchVersion = '8.1.4';
+        if (empty($prestashopVersions)) {
+            return $prestashopVersions;
+        }
 
-        // Check if versions are already in the list
-        $addDevelopmentVersion = true;
-        $addPatchVersion = true;
+        // Let's initialize utilities to get us the highest versions
+        $versionUtils = new VersionUtils();
+        $developmentVersions = [];
+
+        // Add next major, minor and patches for the current highest version
+        $highestVersion = $versionUtils->getHighestStableVersionFromList($prestashopVersions);
+        if (!empty($highestVersion)) {
+            $developmentVersions[] = $highestVersion->getNextMajorVersion();
+            $developmentVersions[] = $highestVersion->getNextMinorVersion();
+            $developmentVersions[] = $highestVersion->getNextPatchVersion();
+        }
+
+        // Let's also add possible patches for previous major
+        $highestPreviousVersion = $versionUtils->getHighestStablePreviousVersionFromList($prestashopVersions);
+        if (!empty($highestPreviousVersion)) {
+            $developmentVersions[] = $highestPreviousVersion->getNextMinorVersion();
+            $developmentVersions[] = $highestPreviousVersion->getNextPatchVersion();
+        }
+
+        // Remove all development versions that are older than the min version
+        foreach ($developmentVersions as $k => $v) {
+            if (version_compare(self::MIN_PRESTASHOP_VERSION, $v, '>')) {
+                unset($developmentVersions[$k]);
+            }
+        }
+
+        // Remove all development versions that are already in the list, for some reason
         foreach ($prestashopVersions as $prestashopVersion) {
-            if ($prestashopVersion->getVersion() === $developmentVersion) {
-                $addDevelopmentVersion = false;
-            }
-            if ($prestashopVersion->getVersion() === $nextPatchVersion) {
-                $addPatchVersion = false;
+            if (in_array($prestashopVersion->getVersion(), $developmentVersions)) {
+                $key = array_search($prestashopVersion->getVersion(), $developmentVersions);
+                unset($developmentVersions[$key]);
             }
         }
 
-        // Now add versions if needed
-        if ($addPatchVersion) {
-            $prestashopVersions[] = new PrestaShop($nextPatchVersion);
-        }
-        if ($addDevelopmentVersion) {
+        // Add all of them to the list
+        foreach ($developmentVersions as $developmentVersion) {
             $prestashopVersions[] = new PrestaShop($developmentVersion);
         }
 

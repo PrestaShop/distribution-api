@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Command;
 
 use App\Command\GenerateJsonCommand;
+use App\Model\PrestaShop;
 use App\Util\ModuleUtils;
 use App\Util\PrestaShopUtils;
 use App\Util\PublicDownloadUrlProvider;
@@ -106,5 +107,64 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             $baseExpected . '/prestashop/beta.json',
             $baseOutput . '/prestashop/beta.json'
         );
+    }
+
+    /**
+     * @dataProvider versionListProvider
+     */
+    public function testAddVersionsUnderDelopment(array $before, array $afterExpected)
+    {
+        $this->assertEquals($afterExpected, $this->command->addVersionsUnderDelopment($before));
+    }
+
+    public function versionListProvider(): iterable
+    {
+        // Pretty normal scenario
+        yield [[
+                new Prestashop('8.1.4'),
+                new Prestashop('8.1.3'),
+                new Prestashop('9.0.0'),
+                new Prestashop('9.0.3'),
+                new Prestashop('1.7.8.10'),
+            ], [
+                new Prestashop('8.1.4'),
+                new Prestashop('8.1.3'),
+                new Prestashop('9.0.0'),
+                new Prestashop('9.0.3'),
+                new Prestashop('1.7.8.10'),
+                new Prestashop('10.0.0'),
+                new Prestashop('9.1.0'),
+                new Prestashop('9.0.4'),
+                new Prestashop('8.2.0'),
+                new Prestashop('8.1.5'),
+        ]];
+        // Scenario to avoid adding 1.7 versions as a previous major
+        yield [[
+            new Prestashop('8.1.4'),
+            new Prestashop('8.1.3'),
+            new Prestashop('1.7.8.10'),
+        ], [
+            new Prestashop('8.1.4'),
+            new Prestashop('8.1.3'),
+            new Prestashop('1.7.8.10'),
+            new Prestashop('9.0.0'),
+            new Prestashop('8.2.0'),
+            new Prestashop('8.1.5'),
+        ]];
+        // Scenario to avoid considering beta as a stable channel
+        yield [[
+            new Prestashop('8.1.4'),
+            new Prestashop('8.1.3'),
+            new Prestashop('9.0.0-beta'),
+            new Prestashop('1.7.8.10'),
+        ], [
+            new Prestashop('8.1.4'),
+            new Prestashop('8.1.3'),
+            new Prestashop('9.0.0-beta'),
+            new Prestashop('1.7.8.10'),
+            new Prestashop('9.0.0'),
+            new Prestashop('8.2.0'),
+            new Prestashop('8.1.5'),
+        ]];
     }
 }
