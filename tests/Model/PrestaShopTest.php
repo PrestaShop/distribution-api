@@ -32,7 +32,7 @@ class PrestaShopTest extends TestCase
     /**
      * @dataProvider nextVersionsProvider
      */
-    public function testNextVersion(string $version, int $nextMajor, int $nextMinor, int $nextPatch)
+    public function testNextVersion(string $version, string $nextMajor, string $nextMinor, string $nextPatch)
     {
         $prestaShop = new PrestaShop($version);
         $this->assertSame($nextMajor, $prestaShop->getNextMajorVersion());
