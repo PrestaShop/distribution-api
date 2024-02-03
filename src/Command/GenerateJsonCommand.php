@@ -171,7 +171,7 @@ class GenerateJsonCommand extends Command
         }
 
         // We will also add the next previous version, if found
-        $possiblePreviousMajor = (int) $highestVersion->getMajorVersionNumber() - 1;
+        $possiblePreviousMajor = $highestVersion->getMajorVersionNumber() - 1;
         $highestPreviousVersion = null;
         foreach ($prestashopVersions as $prestashopVersion) {
             if (($highestPreviousVersion === null || version_compare($prestashopVersion->getVersion(), $highestPreviousVersion->getVersion())) &&
@@ -186,39 +186,13 @@ class GenerateJsonCommand extends Command
          * For example, 8.1.4 and 9.0.0.
          * Now we will add some possible next versions that may be in development.
          */
-
         $developmentVersions = [];
-        // Add next major
-        $developmentVersions[] = implode('.', [
-            (int) $highestVersion->getMajorVersionNumber() + 1,
-            0,
-            0,
-        ]);
-
-        // Add patches for current major
-        $developmentVersions[] = implode('.', [
-            (int) $highestVersion->getMajorVersionNumber(),
-            (int) $highestVersion->getMinorVersionNumber(),
-            (int) $highestVersion->getPatchVersionNumber() + 1,
-        ]);
-        $developmentVersions[] = implode('.', [
-            (int) $highestVersion->getMajorVersionNumber(),
-            (int) $highestVersion->getMinorVersionNumber() + 1,
-            0,
-        ]);
-
-        // Add patches for previous major
+        $developmentVersions[] = $highestVersion->getNextMajorVersion();
+        $developmentVersions[] = $highestVersion->getNextMinorVersion();
+        $developmentVersions[] = $highestVersion->getNextPatchVersion();
         if (!empty($highestPreviousVersion)) {
-            $developmentVersions[] = implode('.', [
-                (int) $highestPreviousVersion->getMajorVersionNumber(),
-                (int) $highestPreviousVersion->getMinorVersionNumber(),
-                (int) $highestPreviousVersion->getPatchVersionNumber() + 1,
-            ]);
-            $developmentVersions[] = implode('.', [
-                (int) $highestPreviousVersion->getMajorVersionNumber(),
-                (int) $highestPreviousVersion->getMinorVersionNumber() + 1,
-                0,
-            ]);
+            $developmentVersions[] = $highestPreviousVersion->getNextMinorVersion();
+            $developmentVersions[] = $highestPreviousVersion->getNextPatchVersion();
         }
 
         // Remove all development versions that are already in the list, for some reason

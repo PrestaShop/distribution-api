@@ -31,28 +31,55 @@ class PrestaShop implements JsonSerializable
         return $this->version;
     }
 
-    public function getMajorVersionNumber(): string
+    public function getNextMajorVersion(): string
     {
-        $version = $this->stripExtraDataFromVersion($this->version);
-        $version = explode('.', $version);
-
-        return $version[0];
+        return implode('.', [
+            $this->getMajorVersionNumber() + 1,
+            0,
+            0,
+        ]);
     }
 
-    public function getMinorVersionNumber(): string
+    public function getNextMinorVersion(): string
     {
-        $version = $this->stripExtraDataFromVersion($this->version);
-        $version = explode('.', $version);
-
-        return $version[1];
+        return implode('.', [
+            $this->getMajorVersionNumber(),
+            $this->getMinorVersionNumber() + 1,
+            0,
+        ]);
     }
 
-    public function getPatchVersionNumber(): string
+    public function getNextPatchVersion(): string
+    {
+        return implode('.', [
+            $this->getMajorVersionNumber(),
+            $this->getMinorVersionNumber(),
+            $this->getPatchVersionNumber() + 1,
+        ]);
+    }
+
+    public function getMajorVersionNumber(): int
     {
         $version = $this->stripExtraDataFromVersion($this->version);
         $version = explode('.', $version);
 
-        return $version[2];
+        return (int) $version[0];
+    }
+
+    public function getMinorVersionNumber(): int
+    {
+        $version = $this->stripExtraDataFromVersion($this->version);
+        $version = explode('.', $version);
+
+        return (int) $version[1];
+    }
+
+    public function getPatchVersionNumber(): int
+    {
+        $version = $this->stripExtraDataFromVersion($this->version);
+        $version = explode('.', $version);
+
+        return (int) $version[2];
     }
 
     private function stripExtraDataFromVersion(string $version): string
