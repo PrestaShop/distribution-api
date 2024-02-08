@@ -31,6 +31,67 @@ class PrestaShop implements JsonSerializable
         return $this->version;
     }
 
+    public function getNextMajorVersion(): string
+    {
+        return implode('.', [
+            $this->getMajorVersionNumber() + 1,
+            0,
+            0,
+        ]);
+    }
+
+    public function getNextMinorVersion(): string
+    {
+        return implode('.', [
+            $this->getMajorVersionNumber(),
+            $this->getMinorVersionNumber() + 1,
+            0,
+        ]);
+    }
+
+    public function getNextPatchVersion(): string
+    {
+        return implode('.', [
+            $this->getMajorVersionNumber(),
+            $this->getMinorVersionNumber(),
+            $this->getPatchVersionNumber() + 1,
+        ]);
+    }
+
+    public function getMajorVersionNumber(): int
+    {
+        $version = $this->stripExtraDataFromVersion($this->version);
+        $version = explode('.', $version);
+
+        return (int) $version[0];
+    }
+
+    public function getMinorVersionNumber(): int
+    {
+        $version = $this->stripExtraDataFromVersion($this->version);
+        $version = explode('.', $version);
+
+        return (int) $version[1];
+    }
+
+    public function getPatchVersionNumber(): int
+    {
+        $version = $this->stripExtraDataFromVersion($this->version);
+        $version = explode('.', $version);
+
+        return (int) $version[2];
+    }
+
+    private function stripExtraDataFromVersion(string $version): string
+    {
+        if (str_starts_with($version, '1.')) {
+            $version = substr($version, 2);
+        }
+        $version = explode('-', $version);
+
+        return $version[0];
+    }
+
     public function getMinPhpVersion(): ?string
     {
         return $this->minPhpVersion;
