@@ -137,6 +137,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
                 new Prestashop('9.0.4'),
                 new Prestashop('8.2.0'),
                 new Prestashop('8.1.5'),
+                new Prestashop('8.2.1'),
         ]];
         // Scenario to avoid adding 1.7 versions as a previous major
         yield [[
@@ -150,6 +151,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             new Prestashop('9.0.0'),
             new Prestashop('8.2.0'),
             new Prestashop('8.1.5'),
+            new Prestashop('8.2.1'),
         ]];
         // Scenario to avoid considering beta as a stable channel
         yield [[
@@ -165,6 +167,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             new Prestashop('9.0.0'),
             new Prestashop('8.2.0'),
             new Prestashop('8.1.5'),
+            new Prestashop('8.2.1'),
         ]];
     }
 }
