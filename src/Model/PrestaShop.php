@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use InvalidArgumentException;
 use JsonSerializable;
 
 class PrestaShop implements JsonSerializable
@@ -12,7 +13,11 @@ class PrestaShop implements JsonSerializable
     public const CHANNEL_RC = 'rc';
     public const CHANNEL_BETA = 'beta';
 
+    public const FLAVOR_CLASSIC = 'CLASSIC';
+    public const FLAVOR_OPEN_SOURCE = 'OPEN_SOURCE';
+
     private string $version;
+    private string $flavor;
     private ?string $minPhpVersion = null;
     private ?string $maxPhpVersion = null;
     private ?string $githubZipUrl = null;
@@ -21,14 +26,24 @@ class PrestaShop implements JsonSerializable
     private ?string $xmlDownloadUrl = null;
     private ?string $zipMD5 = null;
 
-    public function __construct(string $version)
+    public function __construct(string $version, string $flavor = self::FLAVOR_OPEN_SOURCE)
     {
+        if ($flavor !== self::FLAVOR_CLASSIC && $flavor !== self::FLAVOR_OPEN_SOURCE) {
+            throw new InvalidArgumentException(sprintf('Invalid flavor "%s" provided. Accepted values are: "%s", "%s".', $flavor, self::FLAVOR_CLASSIC, self::FLAVOR_OPEN_SOURCE));
+        }
+
         $this->version = $version;
+        $this->flavor = $flavor;
     }
 
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    public function getFlavor(): string
+    {
+        return $this->flavor;
     }
 
     public function getNextMajorVersion(): string
@@ -193,6 +208,7 @@ class PrestaShop implements JsonSerializable
     {
         return [
             'version' => $this->getVersion(),
+            'flavor' => $this->getFlavor(),
             'php_max_version' => $this->getMaxPhpVersion(),
             'php_min_version' => $this->getMinPhpVersion(),
             'zip_download_url' => $this->getZipDownloadUrl(),
