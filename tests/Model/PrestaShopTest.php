@@ -15,7 +15,7 @@ class PrestaShopTest extends TestCase
      */
     public function testIsStable(string $version, bool $expected)
     {
-        $prestaShop = new PrestaShop($version, PrestaShop::FLAVOR_OPEN_SOURCE);
+        $prestaShop = new PrestaShop($version, PrestaShop::DISTRIBUTION_OPEN_SOURCE);
         $this->assertSame($expected, $prestaShop->isStable());
     }
 
@@ -24,7 +24,7 @@ class PrestaShopTest extends TestCase
      */
     public function testVersionNumber(string $version, int $expectedMajor, int $expectedMinor, int $expectedPatch)
     {
-        $prestaShop = new PrestaShop($version, PrestaShop::FLAVOR_OPEN_SOURCE);
+        $prestaShop = new PrestaShop($version, PrestaShop::DISTRIBUTION_OPEN_SOURCE);
         $this->assertSame($expectedMajor, $prestaShop->getMajorVersionNumber());
         $this->assertSame($expectedMinor, $prestaShop->getMinorVersionNumber());
         $this->assertSame($expectedPatch, $prestaShop->getPatchVersionNumber());
@@ -35,7 +35,7 @@ class PrestaShopTest extends TestCase
      */
     public function testNextVersion(string $version, string $nextMajor, string $nextMinor, string $nextPatch)
     {
-        $prestaShop = new PrestaShop($version, PrestaShop::FLAVOR_OPEN_SOURCE);
+        $prestaShop = new PrestaShop($version, PrestaShop::DISTRIBUTION_OPEN_SOURCE);
         $this->assertSame($nextMajor, $prestaShop->getNextMajorVersion());
         $this->assertSame($nextMinor, $prestaShop->getNextMinorVersion());
         $this->assertSame($nextPatch, $prestaShop->getNextPatchVersion());
@@ -46,7 +46,7 @@ class PrestaShopTest extends TestCase
      */
     public function testIsRC(string $version, bool $expected)
     {
-        $prestaShop = new PrestaShop($version, PrestaShop::FLAVOR_OPEN_SOURCE);
+        $prestaShop = new PrestaShop($version, PrestaShop::DISTRIBUTION_OPEN_SOURCE);
         $this->assertSame($expected, $prestaShop->isRC());
     }
 
@@ -55,16 +55,24 @@ class PrestaShopTest extends TestCase
      */
     public function testIsBeta(string $version, bool $expected)
     {
-        $prestaShop = new PrestaShop($version, PrestaShop::FLAVOR_OPEN_SOURCE);
+        $prestaShop = new PrestaShop($version, PrestaShop::DISTRIBUTION_OPEN_SOURCE);
         $this->assertSame($expected, $prestaShop->isBeta());
     }
 
-    public function testInvalidFlavor()
+    public function testValidDistribution()
+    {
+        $expected = PrestaShop::DISTRIBUTION_OPEN_SOURCE;
+
+        $prestaShop = new PrestaShop('1.7.8.0', PrestaShop::DISTRIBUTION_OPEN_SOURCE);
+        $this->assertSame($expected, $prestaShop->getDistribution());
+    }
+
+    public function testInvalidDistribution()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid flavor "toto" provided. Accepted values are: "CLASSIC", "OPEN_SOURCE".');
+        $this->expectExceptionMessage('Invalid distribution "toto" provided. Accepted values are: "open_source", "classic".');
 
-        $prestaShop = new PrestaShop('1.7.8.0', 'toto');
+        new PrestaShop('1.7.8.0', 'toto');
     }
 
     public function stableProvider(): iterable

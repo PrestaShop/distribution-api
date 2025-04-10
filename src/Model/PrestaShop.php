@@ -13,11 +13,12 @@ class PrestaShop implements JsonSerializable
     public const CHANNEL_RC = 'rc';
     public const CHANNEL_BETA = 'beta';
 
-    public const FLAVOR_CLASSIC = 'CLASSIC';
-    public const FLAVOR_OPEN_SOURCE = 'OPEN_SOURCE';
+    public const DISTRIBUTION_CLASSIC = 'classic';
+    public const DISTRIBUTION_OPEN_SOURCE = 'open_source';
+    public const DISTRIBUTIONS_LIST = [self::DISTRIBUTION_OPEN_SOURCE, self::DISTRIBUTION_CLASSIC];
 
     private string $version;
-    private string $flavor;
+    private string $distribution;
     private ?string $minPhpVersion = null;
     private ?string $maxPhpVersion = null;
     private ?string $githubZipUrl = null;
@@ -26,14 +27,15 @@ class PrestaShop implements JsonSerializable
     private ?string $xmlDownloadUrl = null;
     private ?string $zipMD5 = null;
 
-    public function __construct(string $version, string $flavor = self::FLAVOR_OPEN_SOURCE)
+    public function __construct(string $version, string $distribution = self::DISTRIBUTION_OPEN_SOURCE)
     {
-        if ($flavor !== self::FLAVOR_CLASSIC && $flavor !== self::FLAVOR_OPEN_SOURCE) {
-            throw new InvalidArgumentException(sprintf('Invalid flavor "%s" provided. Accepted values are: "%s", "%s".', $flavor, self::FLAVOR_CLASSIC, self::FLAVOR_OPEN_SOURCE));
+        if (!in_array($distribution, self::DISTRIBUTIONS_LIST)) {
+            $distributions = array_map(fn ($f) => sprintf('"%s"', $f), self::DISTRIBUTIONS_LIST);
+            throw new InvalidArgumentException(sprintf('Invalid distribution "%s" provided. Accepted values are: %s.', $distribution, implode(', ', $distributions)));
         }
 
         $this->version = $version;
-        $this->flavor = $flavor;
+        $this->distribution = $distribution;
     }
 
     public function getVersion(): string
@@ -41,9 +43,9 @@ class PrestaShop implements JsonSerializable
         return $this->version;
     }
 
-    public function getFlavor(): string
+    public function getDistribution(): string
     {
-        return $this->flavor;
+        return $this->distribution;
     }
 
     public function getNextMajorVersion(): string
@@ -192,6 +194,9 @@ class PrestaShop implements JsonSerializable
         return (bool) preg_match('/^[\d\.]+\-beta\.\d+$/', $this->version);
     }
 
+    /**
+     * @return self::CHANNEL_*
+     */
     private function getStability(): string
     {
         if ($this->isStable()) {
@@ -208,7 +213,7 @@ class PrestaShop implements JsonSerializable
     {
         return [
             'version' => $this->getVersion(),
-            'flavor' => $this->getFlavor(),
+            'distribution' => $this->getDistribution(),
             'php_max_version' => $this->getMaxPhpVersion(),
             'php_min_version' => $this->getMinPhpVersion(),
             'zip_download_url' => $this->getZipDownloadUrl(),

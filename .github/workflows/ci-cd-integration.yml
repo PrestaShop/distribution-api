@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout the repository 🎁
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: 'Authenticating to GCP ⚙️'
         uses: google-github-actions/auth@v1
