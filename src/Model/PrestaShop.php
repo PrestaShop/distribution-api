@@ -20,6 +20,7 @@ class PrestaShop implements JsonSerializable
     private ?string $zipDownloadUrl = null;
     private ?string $xmlDownloadUrl = null;
     private ?string $zipMD5 = null;
+    private ?string $releaseNoteUrl = null;
 
     public function __construct(string $version)
     {
@@ -189,6 +190,16 @@ class PrestaShop implements JsonSerializable
         return self::CHANNEL_BETA;
     }
 
+    public function getReleaseNoteUrl(): ?string
+    {
+        return $this->releaseNoteUrl;
+    }
+
+    public function setReleaseNoteUrl(?string $releaseNoteUrl): void
+    {
+        $this->releaseNoteUrl = $releaseNoteUrl;
+    }
+
     public function jsonSerialize(): mixed
     {
         return [
@@ -199,6 +210,7 @@ class PrestaShop implements JsonSerializable
             'zip_md5' => $this->getZipMD5(),
             'xml_download_url' => $this->getXmlDownloadUrl(),
             'stability' => $this->getStability(),
+            'release_notes_url' => $this->getReleaseNoteUrl(),
         ];
     }
 }
