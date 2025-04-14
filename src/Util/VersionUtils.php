@@ -82,7 +82,7 @@ class VersionUtils
     public function formatVersionToSemver(string $version): string
     {
         $version = trim($version);
-        $version = preg_replace('/[-+].*$/', '', $version);
+        $version = (string) preg_replace('/[-+].*$/', '', $version);
 
         $parts = explode('.', $version);
         $parts = array_slice($parts, 0, 3);

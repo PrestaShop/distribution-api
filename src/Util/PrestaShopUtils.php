@@ -264,8 +264,14 @@ class PrestaShopUtils
         }
 
         $jsonContent = file_get_contents($jsonPath);
+        if ($jsonContent === false) {
+            throw new RuntimeException("Failed to read JSON file at : $jsonPath");
+        }
 
         $ps17Compat = json_decode($jsonContent, true);
+        if (!is_array($ps17Compat)) {
+            throw new RuntimeException("Invalid JSON structure in file: $jsonPath");
+        }
 
         $semverVersion = (new VersionUtils())->formatVersionToSemver($prestaShopVersion);
 
