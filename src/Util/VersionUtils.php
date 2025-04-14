@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Util;
 
 use App\Model\PrestaShop;
+use InvalidArgumentException;
 
 class VersionUtils
 {
@@ -89,5 +90,52 @@ class VersionUtils
         $parts = array_pad($parts, 3, '0');
 
         return implode('.', $parts);
+    }
+
+    public static function removeClassicInVersionTag(string $version): string
+    {
+        if (!str_contains($version, PrestaShop::DISTRIBUTION_CLASSIC)) {
+            return $version;
+        }
+
+        return preg_replace('/^(classic-?)|(-?classic)$/i', '', $version) ?? $version;
+    }
+
+    /**
+     * @param string $version the full version string to parse
+     *
+     * @return array{
+     *     base: string,
+     *     distribution: string
+     * } An associative array containing:
+     *     - 'base': the base version (possibly with a beta/rc tag),
+     *     - 'distribution': the distribution version number
+     *
+     * @throws InvalidArgumentException if the version string format is not recognized
+     */
+    public static function parseVersion($version): array
+    {
+        $version = self::removeClassicInVersionTag($version);
+
+        $baseVersion = '';
+        $distVersion = '';
+
+        // Check if the version includes a beta or rc tag
+        if (preg_match('/^([\d\.]+)-([\d\.]+)-(beta|rc)\.(\d+)$/', $version, $matches)) {
+            $baseVersion = $matches[1] . '-' . $matches[3] . '.' . $matches[4];
+            $distVersion = $matches[2];
+        }
+        // Case without beta/rc tag
+        elseif (preg_match('/^([\d\.]+)-([\d\.]+)$/', $version, $matches)) {
+            $baseVersion = $matches[1];
+            $distVersion = $matches[2];
+        } else {
+            throw new InvalidArgumentException(sprintf('Unable to parse version "%s".', $version));
+        }
+
+        return [
+            'base' => $baseVersion,
+            'distribution' => $distVersion,
+        ];
     }
 }

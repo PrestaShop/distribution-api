@@ -7,7 +7,8 @@ namespace Tests\Command;
 use App\Command\GenerateJsonCommand;
 use App\Model\PrestaShop;
 use App\Util\ModuleUtils;
-use App\Util\PrestaShopUtils;
+use App\Util\PrestaShopClassicUtils;
+use App\Util\PrestaShopOpenSourceUtils;
 use App\Util\PublicDownloadUrlProvider;
 use App\Util\ReleaseNoteUtils;
 use Google\Cloud\Storage\Bucket;
@@ -27,33 +28,49 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
         parent::setUp();
         (new Filesystem())->remove((new Finder())->in(__DIR__ . '/../output'));
 
-        $githubClient = $this->createGithubClientMock();
+        $githubOsClient = $this->createGithubClientMock(PrestaShop::DISTRIBUTION_OPEN_SOURCE);
+        $githubClassicClient = $this->createGithubClientMock(PrestaShop::DISTRIBUTION_CLASSIC);
         $bucket = $this->createMock(Bucket::class);
         $urlProvider = new PublicDownloadUrlProvider('');
+        $releaseNoteUtils = new ReleaseNoteUtils();
 
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),
-            $this->createMock(HttpClientInterface::class),
-            $githubClient,
+           $this->createMock(HttpClientInterface::class),
+            $githubOsClient,
             $bucket,
             $urlProvider,
             'prestashop/native-modules',
             self::MIN_PRESTASHOP_VERSION,
             __DIR__ . '/../ressources/modules',
         );
-        $prestaShopUtils = new PrestaShopUtils(
-            $githubClient,
+
+        $prestaShopOpenSourceUtils = new PrestaShopOpenSourceUtils(
+            $githubOsClient,
             $this->createMock(HttpClientInterface::class),
             $bucket,
             $urlProvider,
-            new ReleaseNoteUtils(),
+            $releaseNoteUtils,
+            'Prestashot/Prestashot',
             self::MIN_PRESTASHOP_VERSION,
             __DIR__ . '/../ressources/prestashop',
         );
 
+        $prestaShopClassicUtils = new PrestaShopClassicUtils(
+            $githubClassicClient,
+            $this->createMock(Client::class),
+            $bucket,
+            $urlProvider,
+            $releaseNoteUtils,
+            'Classic/OsIsBetter',
+            self::MIN_PRESTASHOP_VERSION,
+            __DIR__ . '/../ressources/prestashop-classic',
+        );
+
         $this->command = new GenerateJsonCommand(
             $moduleUtils,
-            $prestaShopUtils,
+            $prestaShopOpenSourceUtils,
+            $prestaShopClassicUtils,
             __DIR__ . '/../output'
         );
     }
