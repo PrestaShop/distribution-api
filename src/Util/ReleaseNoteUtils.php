@@ -8,6 +8,7 @@ class ReleaseNoteUtils
 {
     /**
      * @param string $version
+     *
      * @return string|null
      */
     public static function getReleaseNote(string $version): ?string
