@@ -21,17 +21,20 @@ class GenerateJsonCommand extends Command
     protected static $defaultName = 'generateJson';
 
     private ModuleUtils $moduleUtils;
-    private PrestaShopUtils $prestaShopUtils;
+    private PrestaShopUtils $prestaShopOpenSourceUtils;
+    private PrestaShopUtils $prestaShopClassicUtils;
     private string $jsonDir;
 
     public function __construct(
         ModuleUtils $moduleUtils,
-        PrestaShopUtils $prestaShopUtils,
+        PrestaShopUtils $prestaShopOpenSourceUtils,
+        PrestaShopUtils $prestaShopClassicUtils,
         string $jsonDir,
     ) {
         parent::__construct();
         $this->moduleUtils = $moduleUtils;
-        $this->prestaShopUtils = $prestaShopUtils;
+        $this->prestaShopOpenSourceUtils = $prestaShopOpenSourceUtils;
+        $this->prestaShopClassicUtils = $prestaShopClassicUtils;
         $this->jsonDir = $jsonDir;
     }
 
@@ -39,14 +42,12 @@ class GenerateJsonCommand extends Command
     {
         $modules = $this->moduleUtils->getLocalModules();
         $prestashopVersions = array_merge(
-            $this->prestaShopUtils->getLocalVersions(),
-            $this->prestaShopUtils->getVersionsFromBucket()
+            $this->prestaShopClassicUtils->getLocalVersions(),
+            $this->prestaShopOpenSourceUtils->getLocalVersions(),
+            $this->prestaShopOpenSourceUtils->getVersionsFromBucket(),
         );
-        // Remove duplicates by comparing the version
-        $prestashopVersions = array_intersect_key(
-            $prestashopVersions,
-            array_unique(array_map(fn ($item) => $item->getVersion(), $prestashopVersions))
-        );
+
+        $prestashopVersions = $this->filterPrestaShopVersions($prestashopVersions);
 
         // order form the most recent to the oldest
         usort(
@@ -263,5 +264,38 @@ class GenerateJsonCommand extends Command
         }
 
         return $isChannel && ($current === null || version_compare($new->getVersion(), $current->getVersion(), '>'));
+    }
+
+    /**
+     * Filters an array of PrestaShop versions to ensure:
+     * - Only one version is kept per (version + stability) combo.
+     * - "classic" distribution takes priority over "opensource" if duplicates exist.
+     *
+     * @param PrestaShop[] $versions
+     *
+     * @return PrestaShop[] Filtered and deduplicated array
+     */
+    private function filterPrestaShopVersions(array $versions): array
+    {
+        $filtered = [];
+
+        foreach ($versions as $version) {
+            // Build a unique key using version number and stability (e.g. "9.0.0|beta")
+            $key = $version->getVersion() . '|' . $version->getStability();
+
+            // If the key is not yet in the result, just store it
+            if (!isset($filtered[$key])) {
+                $filtered[$key] = $version;
+            // If the current version is "classic" and the existing one isn't, replace it
+            } elseif (
+                $version->getDistribution() === PrestaShop::DISTRIBUTION_CLASSIC &&
+                $filtered[$key]->getDistribution() !== PrestaShop::DISTRIBUTION_CLASSIC
+            ) {
+                $filtered[$key] = $version;
+            }
+        }
+
+        // Re-index the array numerically
+        return array_values($filtered);
     }
 }

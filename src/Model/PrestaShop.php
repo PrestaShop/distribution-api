@@ -19,6 +19,7 @@ class PrestaShop implements JsonSerializable
 
     private string $version;
     private string $distribution;
+    private ?string $distributionVersion = null;
     private ?string $minPhpVersion = null;
     private ?string $maxPhpVersion = null;
     private ?string $githubZipUrl = null;
@@ -47,6 +48,21 @@ class PrestaShop implements JsonSerializable
     public function getDistribution(): string
     {
         return $this->distribution;
+    }
+
+    public function getDistributionVersion(): ?string
+    {
+        return $this->distributionVersion;
+    }
+
+    public function getCompleteVersion(): string
+    {
+        return $this->getVersion() . ($this->getDistributionVersion() ? '-' . $this->getDistributionVersion() : '');
+    }
+
+    public function setDistributionVersion(?string $distributionVersion): void
+    {
+        $this->distributionVersion = $distributionVersion;
     }
 
     public function getNextMajorVersion(): string
@@ -198,7 +214,7 @@ class PrestaShop implements JsonSerializable
     /**
      * @return self::CHANNEL_*
      */
-    private function getStability(): string
+    public function getStability(): string
     {
         if ($this->isStable()) {
             return self::CHANNEL_STABLE;
@@ -225,6 +241,7 @@ class PrestaShop implements JsonSerializable
         return [
             'version' => $this->getVersion(),
             'distribution' => $this->getDistribution(),
+            'distribution_version' => $this->getDistributionVersion(),
             'php_max_version' => $this->getMaxPhpVersion(),
             'php_min_version' => $this->getMinPhpVersion(),
             'zip_download_url' => $this->getZipDownloadUrl(),

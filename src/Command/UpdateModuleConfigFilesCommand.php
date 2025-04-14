@@ -20,10 +20,10 @@ class UpdateModuleConfigFilesCommand extends Command
 
     protected static $defaultName = 'updateModuleConfigFiles';
 
-    public function __construct(ModuleUtils $utils, Client $client, string $moduleListRepository)
+    public function __construct(ModuleUtils $moduleUtils, Client $client, string $moduleListRepository)
     {
         parent::__construct();
-        $this->utils = $utils;
+        $this->utils = $moduleUtils;
         $this->client = $client;
         $this->moduleListRepository = $moduleListRepository;
     }

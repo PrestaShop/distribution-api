@@ -8,20 +8,24 @@ use App\Command\CheckReposCommand;
 use App\Model\PrestaShop;
 use App\Model\Version;
 use App\Util\ModuleUtils;
+use App\Util\PrestaShopClassicUtils;
+use App\Util\PrestaShopOpenSourceUtils;
 use App\Util\PrestaShopUtils;
 
 class CheckReposCommandTest extends AbstractCommandTestCase
 {
     private CheckReposCommand $command;
-    private PrestaShopUtils $prestaShopUtils;
+    private PrestaShopUtils $prestaShopOpenSourceUtils;
+    private PrestaShopUtils $prestaShopClassicUtils;
     private ModuleUtils $moduleUtils;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->prestaShopUtils = $this->createMock(PrestaShopUtils::class);
+        $this->prestaShopOpenSourceUtils = $this->createMock(PrestaShopOpenSourceUtils::class);
+        $this->prestaShopClassicUtils = $this->createMock(PrestaShopClassicUtils::class);
         $this->moduleUtils = $this->createMock(ModuleUtils::class);
-        $this->command = new CheckReposCommand($this->moduleUtils, $this->prestaShopUtils);
+        $this->command = new CheckReposCommand($this->moduleUtils, $this->prestaShopOpenSourceUtils, $this->prestaShopClassicUtils);
     }
 
     public function testNoModuleAssets(): void
@@ -96,13 +100,13 @@ class CheckReposCommandTest extends AbstractCommandTestCase
 
     public function testMissingPrestaShopZipAndXml(): void
     {
-        $this->prestaShopUtils->method('getVersions')->willReturn([new PrestaShop('8.0.0')]);
+        $this->prestaShopOpenSourceUtils->method('getVersions')->willReturn([new PrestaShop('8.0.0')]);
 
         $this->output
             ->expects($this->exactly(3))
             ->method('writeln')
             ->withConsecutive(
-                ['<info>Checking PrestaShop 8.0.0</info>'],
+                ['<info>Checking PrestaShop 8.0.0 for open_source distribution</info>'],
                 ['<error>No Zip asset</error>'],
                 ['<error>No Xml asset</error>'],
             );
@@ -114,13 +118,13 @@ class CheckReposCommandTest extends AbstractCommandTestCase
     {
         $prestaShop = new PrestaShop('8.0.0');
         $prestaShop->setGithubXmlUrl('https://fake.url/prestashop.xml');
-        $this->prestaShopUtils->method('getVersions')->willReturn([$prestaShop]);
+        $this->prestaShopOpenSourceUtils->method('getVersions')->willReturn([$prestaShop]);
 
         $this->output
             ->expects($this->exactly(2))
             ->method('writeln')
             ->withConsecutive(
-                ['<info>Checking PrestaShop 8.0.0</info>'],
+                ['<info>Checking PrestaShop 8.0.0 for open_source distribution</info>'],
                 ['<error>No Zip asset</error>'],
             );
 
@@ -131,13 +135,13 @@ class CheckReposCommandTest extends AbstractCommandTestCase
     {
         $prestaShop = new PrestaShop('8.0.0');
         $prestaShop->setGithubZipUrl('https://fake.url/prestashop.zip');
-        $this->prestaShopUtils->method('getVersions')->willReturn([$prestaShop]);
+        $this->prestaShopOpenSourceUtils->method('getVersions')->willReturn([$prestaShop]);
 
         $this->output
             ->expects($this->exactly(2))
             ->method('writeln')
             ->withConsecutive(
-                ['<info>Checking PrestaShop 8.0.0</info>'],
+                ['<info>Checking PrestaShop 8.0.0 for open_source distribution</info>'],
                 ['<error>No Xml asset</error>'],
             );
 
@@ -149,13 +153,13 @@ class CheckReposCommandTest extends AbstractCommandTestCase
         $prestaShop = new PrestaShop('8.0.0');
         $prestaShop->setGithubZipUrl('https://fake.url/prestahop.zip');
         $prestaShop->setGithubXmlUrl('https://fake.url/prestashop.xml');
-        $this->prestaShopUtils->method('getVersions')->willReturn([$prestaShop]);
+        $this->prestaShopOpenSourceUtils->method('getVersions')->willReturn([$prestaShop]);
 
         $this->output
             ->expects($this->exactly(2))
             ->method('writeln')
             ->withConsecutive(
-                ['<info>Checking PrestaShop 8.0.0</info>'],
+                ['<info>Checking PrestaShop 8.0.0 for open_source distribution</info>'],
                 ['<comment>All good!</comment>'],
             );
 
