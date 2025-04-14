@@ -66,4 +66,28 @@ class VersionUtils
 
         return $highestPreviousVersion;
     }
+
+    /**
+     * Formats a version string to Semantic Versioning (SemVer) with three segments (X.Y.Z).
+     *
+     * Examples:
+     * - '8.0'     => '8.0.0'
+     * - '1.7.0.6' => '1.7.0'
+     * - '1.7.0-beta' => '1.7.0'
+     *
+     * @param string $version
+     *
+     * @return string
+     */
+    public function formatVersionToSemver(string $version): string
+    {
+        $version = trim($version);
+        $version = preg_replace('/[-+].*$/', '', $version);
+
+        $parts = explode('.', $version);
+        $parts = array_slice($parts, 0, 3);
+        $parts = array_pad($parts, 3, '0');
+
+        return implode('.', $parts);
+    }
 }
