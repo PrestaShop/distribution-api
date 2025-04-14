@@ -222,6 +222,7 @@ class PrestaShopUtils
             $versionCompat = $this->getPhpVersionCompatFromJson($prestaShop->getVersion());
             $prestaShop->setMinPhpVersion($versionCompat['php_min_version']);
             $prestaShop->setMaxPhpVersion($versionCompat['php_max_version']);
+
             return;
         }
 
