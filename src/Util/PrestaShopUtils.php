@@ -177,6 +177,7 @@ class PrestaShopUtils
             $prestashop->setZipMD5($prestaShopJson['zip_md5']);
             $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopJson['version']));
             $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopJson['version']));
+            $prestashop->setReleaseNoteUrl(ReleaseNoteUtils::getReleaseNote($prestaShopJson['version']));
             $prestaShops[] = $prestashop;
         }
 
@@ -205,6 +206,7 @@ class PrestaShopUtils
             $this->setVersionsCompat($prestashop);
             $prestashop->setZipMD5(md5_file($versionPath . '/prestashop.zip') ?: null);
             $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopVersion));
+            $prestashop->setReleaseNoteUrl(ReleaseNoteUtils::getReleaseNote($prestaShopVersion));
             if (is_file($versionPath . '/prestashop.xml')) {
                 $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopVersion));
             }
