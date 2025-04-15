@@ -218,6 +218,14 @@ class PrestaShopUtils
 
     private function setVersionsCompat(PrestaShop $prestaShop): void
     {
+        if (version_compare($prestaShop->getVersion(), '8.0.0', '<')) {
+            $versionCompat = $this->getPhpVersionCompatFromJson($prestaShop->getVersion());
+            $prestaShop->setMinPhpVersion($versionCompat['php_min_version']);
+            $prestaShop->setMaxPhpVersion($versionCompat['php_max_version']);
+
+            return;
+        }
+
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $installZip = new ZipArchive();
         $installZip->open($this->prestaShopDir . '/' . $prestaShop->getVersion() . '/prestashop.zip');
@@ -242,6 +250,32 @@ class PrestaShopUtils
                 $prestaShop->setMaxPhpVersion($this->getDefineValue($item));
             }
         }
+    }
+
+    /**
+     * @return array{ php_min_version: string|null, php_max_version: string|null }
+     */
+    private function getPhpVersionCompatFromJson(string $prestaShopVersion): array
+    {
+        $jsonPath = __DIR__ . '/../../resources/json/prestashop17PhpCompat.json';
+
+        if (!file_exists($jsonPath)) {
+            throw new RuntimeException("JSON file not found at : $jsonPath");
+        }
+
+        $jsonContent = file_get_contents($jsonPath);
+        if ($jsonContent === false) {
+            throw new RuntimeException("Failed to read JSON file at : $jsonPath");
+        }
+
+        $ps17Compat = json_decode($jsonContent, true);
+        if (!is_array($ps17Compat)) {
+            throw new RuntimeException("Invalid JSON structure in file: $jsonPath");
+        }
+
+        $semverVersion = (new VersionUtils())->formatVersionToSemver($prestaShopVersion);
+
+        return $ps17Compat[$semverVersion] ?? ['php_min_version' => null, 'php_max_version' => null];
     }
 
     private function isVersionGreaterThanOrEqualToMin(string $version): bool

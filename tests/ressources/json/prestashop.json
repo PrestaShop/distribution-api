@@ -35,7 +35,7 @@
   {
     "version": "1.7.7.8",
     "distribution":"open_source",
-    "php_max_version": null,
+    "php_max_version": "7.3",
     "php_min_version": "7.1.3",
     "zip_download_url": "\/assets\/prestashop\/1.7.7.8\/prestashop.zip",
     "zip_md5": "857b05a04eb2dcc0610c48d50e8d0a8b",
@@ -46,8 +46,8 @@
   {
     "version": "1.7.0.0",
     "distribution":"open_source",
-    "php_max_version": null,
-    "php_min_version": null,
+    "php_max_version": "7.1",
+    "php_min_version": "5.4",
     "zip_download_url": "\/assets\/prestashop\/1.7.0.0\/prestashop.zip",
     "zip_md5": "04adda2f3aed883db3d11b3444838eb1",
     "xml_download_url": null,

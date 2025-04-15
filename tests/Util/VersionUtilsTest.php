@@ -69,4 +69,32 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
             (new VersionUtils())->getHighestStablePreviousVersionFromList([
         ]));
     }
+
+    /**
+     * @dataProvider versionProvider
+     */
+    public function testFormatVersionToSemver(string $input, string $expected): void
+    {
+        $this->assertSame($expected, (new VersionUtils())->formatVersionToSemver($input));
+    }
+
+    public static function versionProvider(): array
+    {
+        return [
+            ['1', '1.0.0'],
+            ['1.2', '1.2.0'],
+            ['1.2.3', '1.2.3'],
+            ['1.2.3.4', '1.2.3'],
+            ['1.2.3.4.5', '1.2.3'],
+            [' 1.2.3 ', '1.2.3'],
+            ['1.2.3-beta', '1.2.3'],
+            ['1.2.3+build123', '1.2.3'],
+            ['1.2.3-beta+build123', '1.2.3'],
+            ['1.2-beta', '1.2.0'],
+            ['1.2+meta', '1.2.0'],
+            ['0', '0.0.0'],
+            ['0.0', '0.0.0'],
+            ['0.0.0', '0.0.0'],
+        ];
+    }
 }

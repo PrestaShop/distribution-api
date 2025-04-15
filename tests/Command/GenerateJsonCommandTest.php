@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Finder;
 
 class GenerateJsonCommandTest extends AbstractCommandTestCase
 {
-    private const MIN_PRESTASHOP_VERSION = '8.0.0';
+    private const MIN_PRESTASHOP_VERSION = '1.7.0.0';
 
     private GenerateJsonCommand $command;
 
