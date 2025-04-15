@@ -1,5 +1,6 @@
 vendor/
-public/json/*
+public/json/prestashop
+public/json/prestashop.json
 !public/json/.gitkeep
 
 var/tmp/*
