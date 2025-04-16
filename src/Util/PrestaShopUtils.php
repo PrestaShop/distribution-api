@@ -265,7 +265,7 @@ class PrestaShopUtils
      *
      * @return void
      */
-    private function loadPrestashop17PhPCompatJson(): void
+    private function loadPrestashop17PhpCompatJson(): void
     {
         $jsonPath = __DIR__ . '/../../resources/json/prestashop17PhpCompat.json';
 
@@ -293,7 +293,7 @@ class PrestaShopUtils
     private function getPhpVersionCompatFromJson(string $prestaShopVersion): array
     {
         if ($this->prestashop17PhpCompatData === null) {
-            $this->loadPrestashop17PhPCompatJson();
+            $this->loadPrestashop17PhpCompatJson();
         }
 
         $semverVersion = (new VersionUtils())->formatVersionToSemver($prestaShopVersion);
