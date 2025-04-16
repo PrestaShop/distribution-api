@@ -7,11 +7,16 @@ use RuntimeException;
 class ReleaseNoteUtils
 {
     /**
-     * @param string $version
-     *
-     * @return string|null
+     * @var array<string, string>|null
      */
-    public static function getReleaseNote(string $version): ?string
+    private ?array $releaseNoteData = null;
+
+    /**
+     * Load json release and assign it to class variable.
+     *
+     * @return void
+     */
+    private function loadReleaseNoteJson(): void
     {
         $path = __DIR__ . '/../../resources/json/releaseNotes.json';
 
@@ -31,6 +36,20 @@ class ReleaseNoteUtils
             throw new RuntimeException("Invalid JSON structure in file: $path");
         }
 
-        return $data[$version] ?? null;
+        $this->releaseNoteData = $data;
+    }
+
+    /**
+     * @param string $version
+     *
+     * @return string|null
+     */
+    public function getReleaseNote(string $version): ?string
+    {
+        if ($this->releaseNoteData === null) {
+            $this->loadReleaseNoteJson();
+        }
+
+        return $this->releaseNoteData[$version] ?? null;
     }
 }

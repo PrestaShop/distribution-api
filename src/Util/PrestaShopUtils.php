@@ -27,6 +27,7 @@ class PrestaShopUtils
     private string $prestaShopDir;
     private string $prestaShopMinVersion;
     private PublicDownloadUrlProvider $publicDownloadUrlProvider;
+    private ReleaseNoteUtils $releaseNoteUtils;
 
     public function __construct(
         GithubClient $githubClient,
@@ -42,6 +43,7 @@ class PrestaShopUtils
         $this->publicDownloadUrlProvider = $publicDownloadUrlProvider;
         $this->prestaShopMinVersion = $prestaShopMinVersion;
         $this->prestaShopDir = $prestaShopDir;
+        $this->releaseNoteUtils = new ReleaseNoteUtils();
     }
 
     public function download(PrestaShop $prestaShop): void
@@ -177,7 +179,7 @@ class PrestaShopUtils
             $prestashop->setZipMD5($prestaShopJson['zip_md5']);
             $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopJson['version']));
             $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopJson['version']));
-            $prestashop->setReleaseNoteUrl(ReleaseNoteUtils::getReleaseNote($prestaShopJson['version']));
+            $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestaShopJson['version']));
             $prestaShops[] = $prestashop;
         }
 
@@ -206,7 +208,7 @@ class PrestaShopUtils
             $this->setVersionsCompat($prestashop);
             $prestashop->setZipMD5(md5_file($versionPath . '/prestashop.zip') ?: null);
             $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopVersion));
-            $prestashop->setReleaseNoteUrl(ReleaseNoteUtils::getReleaseNote($prestaShopVersion));
+            $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestaShopVersion));
             if (is_file($versionPath . '/prestashop.xml')) {
                 $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopVersion));
             }
