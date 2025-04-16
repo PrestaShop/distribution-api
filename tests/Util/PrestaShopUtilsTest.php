@@ -6,6 +6,7 @@ namespace Tests\Util;
 
 use App\Util\PrestaShopUtils;
 use App\Util\PublicDownloadUrlProvider;
+use App\Util\ReleaseNoteUtils;
 use Google\Cloud\Storage\Bucket;
 use GuzzleHttp\Client;
 use Tests\AbstractMockedGithubClientTestCase;
@@ -22,6 +23,7 @@ class PrestaShopUtilsTest extends AbstractMockedGithubClientTestCase
             $this->createMock(Client::class),
             $this->createMock(Bucket::class),
             new PublicDownloadUrlProvider(''),
+            new ReleaseNoteUtils(),
             $minPrestaShopVersion,
             __DIR__ . '/../ressources/prestashop'
         );

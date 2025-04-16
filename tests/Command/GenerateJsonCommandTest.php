@@ -9,6 +9,7 @@ use App\Model\PrestaShop;
 use App\Util\ModuleUtils;
 use App\Util\PrestaShopUtils;
 use App\Util\PublicDownloadUrlProvider;
+use App\Util\ReleaseNoteUtils;
 use Google\Cloud\Storage\Bucket;
 use GuzzleHttp\Client;
 use Psssst\ModuleParser;
@@ -45,6 +46,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             $this->createMock(Client::class),
             $bucket,
             $urlProvider,
+            new ReleaseNoteUtils(),
             self::MIN_PRESTASHOP_VERSION,
             __DIR__ . '/../ressources/prestashop',
         );
