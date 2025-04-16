@@ -24,10 +24,10 @@ class PrestaShopUtils
     private GithubClient $githubClient;
     private Client $client;
     private Bucket $bucket;
-    private string $prestaShopDir;
-    private string $prestaShopMinVersion;
     private PublicDownloadUrlProvider $publicDownloadUrlProvider;
     private ReleaseNoteUtils $releaseNoteUtils;
+    private string $prestaShopDir;
+    private string $prestaShopMinVersion;
 
     /**
      * @var array<string, array{php_min_version: string, php_max_version: string}>|null
@@ -39,6 +39,7 @@ class PrestaShopUtils
         Client $client,
         Bucket $bucket,
         PublicDownloadUrlProvider $publicDownloadUrlProvider,
+        ReleaseNoteUtils $releaseNoteUtils,
         string $prestaShopMinVersion,
         string $prestaShopDir,
     ) {
@@ -46,9 +47,9 @@ class PrestaShopUtils
         $this->client = $client;
         $this->bucket = $bucket;
         $this->publicDownloadUrlProvider = $publicDownloadUrlProvider;
+        $this->releaseNoteUtils = $releaseNoteUtils;
         $this->prestaShopMinVersion = $prestaShopMinVersion;
         $this->prestaShopDir = $prestaShopDir;
-        $this->releaseNoteUtils = new ReleaseNoteUtils();
     }
 
     public function download(PrestaShop $prestaShop): void
