@@ -29,6 +29,11 @@ class PrestaShopUtils
     private PublicDownloadUrlProvider $publicDownloadUrlProvider;
     private ReleaseNoteUtils $releaseNoteUtils;
 
+    /**
+     * @var array<string, array{php_min_version: string, php_max_version: string}>|null
+     */
+    private ?array $prestashop17PhpCompatData = null;
+
     public function __construct(
         GithubClient $githubClient,
         Client $client,
@@ -255,9 +260,11 @@ class PrestaShopUtils
     }
 
     /**
-     * @return array{ php_min_version: string|null, php_max_version: string|null }
+     * Load json prestashop 1.7 compatibility and assign it to class variable.
+     *
+     * @return void
      */
-    private function getPhpVersionCompatFromJson(string $prestaShopVersion): array
+    private function loadPrestashop17PhPCompatJson(): void
     {
         $jsonPath = __DIR__ . '/../../resources/json/prestashop17PhpCompat.json';
 
@@ -270,14 +277,27 @@ class PrestaShopUtils
             throw new RuntimeException("Failed to read JSON file at : $jsonPath");
         }
 
+        /** @var array<string, array{php_min_version: string, php_max_version: string}> $ps17Compat */
         $ps17Compat = json_decode($jsonContent, true);
         if (!is_array($ps17Compat)) {
             throw new RuntimeException("Invalid JSON structure in file: $jsonPath");
         }
 
+        $this->prestashop17PhpCompatData = $ps17Compat;
+    }
+
+    /**
+     * @return array{ php_min_version: string|null, php_max_version: string|null }
+     */
+    private function getPhpVersionCompatFromJson(string $prestaShopVersion): array
+    {
+        if ($this->prestashop17PhpCompatData === null) {
+            $this->loadPrestashop17PhPCompatJson();
+        }
+
         $semverVersion = (new VersionUtils())->formatVersionToSemver($prestaShopVersion);
 
-        return $ps17Compat[$semverVersion] ?? ['php_min_version' => null, 'php_max_version' => null];
+        return $this->prestashop17PhpCompatData[$semverVersion] ?? ['php_min_version' => null, 'php_max_version' => null];
     }
 
     private function isVersionGreaterThanOrEqualToMin(string $version): bool
