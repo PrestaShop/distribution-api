@@ -26,7 +26,7 @@ jobs:
       - name: Setting up google Cloud SDK 💳
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: core-oss-integration
+          project_id: core-oss-preproduction
 
       - name: Configure gcloud 👷
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev
