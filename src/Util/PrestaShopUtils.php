@@ -24,15 +24,22 @@ class PrestaShopUtils
     private GithubClient $githubClient;
     private Client $client;
     private Bucket $bucket;
+    private PublicDownloadUrlProvider $publicDownloadUrlProvider;
+    private ReleaseNoteUtils $releaseNoteUtils;
     private string $prestaShopDir;
     private string $prestaShopMinVersion;
-    private PublicDownloadUrlProvider $publicDownloadUrlProvider;
+
+    /**
+     * @var array<string, array{php_min_version: string, php_max_version: string}>|null
+     */
+    private ?array $prestashop17PhpCompatData = null;
 
     public function __construct(
         GithubClient $githubClient,
         Client $client,
         Bucket $bucket,
         PublicDownloadUrlProvider $publicDownloadUrlProvider,
+        ReleaseNoteUtils $releaseNoteUtils,
         string $prestaShopMinVersion,
         string $prestaShopDir,
     ) {
@@ -40,6 +47,7 @@ class PrestaShopUtils
         $this->client = $client;
         $this->bucket = $bucket;
         $this->publicDownloadUrlProvider = $publicDownloadUrlProvider;
+        $this->releaseNoteUtils = $releaseNoteUtils;
         $this->prestaShopMinVersion = $prestaShopMinVersion;
         $this->prestaShopDir = $prestaShopDir;
     }
@@ -177,7 +185,7 @@ class PrestaShopUtils
             $prestashop->setZipMD5($prestaShopJson['zip_md5']);
             $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopJson['version']));
             $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopJson['version']));
-            $prestashop->setReleaseNoteUrl(ReleaseNoteUtils::getReleaseNote($prestaShopJson['version']));
+            $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestaShopJson['version']));
             $prestaShops[] = $prestashop;
         }
 
@@ -206,7 +214,7 @@ class PrestaShopUtils
             $this->setVersionsCompat($prestashop);
             $prestashop->setZipMD5(md5_file($versionPath . '/prestashop.zip') ?: null);
             $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopVersion));
-            $prestashop->setReleaseNoteUrl(ReleaseNoteUtils::getReleaseNote($prestaShopVersion));
+            $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestaShopVersion));
             if (is_file($versionPath . '/prestashop.xml')) {
                 $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopVersion));
             }
@@ -253,9 +261,11 @@ class PrestaShopUtils
     }
 
     /**
-     * @return array{ php_min_version: string|null, php_max_version: string|null }
+     * Load json prestashop 1.7 compatibility and assign it to class variable.
+     *
+     * @return void
      */
-    private function getPhpVersionCompatFromJson(string $prestaShopVersion): array
+    private function loadPrestashop17PhpCompatJson(): void
     {
         $jsonPath = __DIR__ . '/../../resources/json/prestashop17PhpCompat.json';
 
@@ -268,14 +278,27 @@ class PrestaShopUtils
             throw new RuntimeException("Failed to read JSON file at : $jsonPath");
         }
 
+        /** @var array<string, array{php_min_version: string, php_max_version: string}> $ps17Compat */
         $ps17Compat = json_decode($jsonContent, true);
         if (!is_array($ps17Compat)) {
             throw new RuntimeException("Invalid JSON structure in file: $jsonPath");
         }
 
+        $this->prestashop17PhpCompatData = $ps17Compat;
+    }
+
+    /**
+     * @return array{ php_min_version: string|null, php_max_version: string|null }
+     */
+    private function getPhpVersionCompatFromJson(string $prestaShopVersion): array
+    {
+        if ($this->prestashop17PhpCompatData === null) {
+            $this->loadPrestashop17PhpCompatJson();
+        }
+
         $semverVersion = (new VersionUtils())->formatVersionToSemver($prestaShopVersion);
 
-        return $ps17Compat[$semverVersion] ?? ['php_min_version' => null, 'php_max_version' => null];
+        return $this->prestashop17PhpCompatData[$semverVersion] ?? ['php_min_version' => null, 'php_max_version' => null];
     }
 
     private function isVersionGreaterThanOrEqualToMin(string $version): bool
