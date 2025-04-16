@@ -18,14 +18,15 @@ jobs:
       - name: Checkout the repository 🎁
         uses: actions/checkout@v4
 
-      - name: 'Authenticating to GCP ⚙️'
-        uses: google-github-actions/auth@v1
+      - name: Authenticating to GCP ⚙️
+        uses: google-github-actions/auth@v2
         with:
-          project_id: core-oss-integration
           credentials_json: ${{ secrets.G_CREDENTIALS_INTEGRATION }}
 
-      - name: 'Setting up Cloud SDK 💳'
-        uses: 'google-github-actions/setup-gcloud@v1'
+      - name: Setting up google Cloud SDK 💳
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: core-oss-integration
 
       - name: Configure gcloud 👷
         run: gcloud auth configure-docker europe-west1-docker.pkg.dev
@@ -44,7 +45,7 @@ jobs:
           docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}
 
       - name: Trigger deploy 🚀
-        uses: aurelien-baudet/workflow-dispatch@v2
+        uses: the-actions-org/workflow-dispatch@v4
         with:
           workflow: deployment-integration.yml
           repo: PrestaShopCorp/terraform-core-oss-distribution-api
