@@ -99,24 +99,26 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
         ];
     }
 
-    public function testParseVersionStandardVersion()
+    public function testParseVersionOsStandardVersion()
+    {
+        $result = VersionUtils::parseVersion('9.0.0');
+        $this->assertEquals('9.0.0', $result['base']);
+        $this->assertEquals(null, $result['distribution']);
+    }
+
+    public function testParseVersionOsStandardVersionFor17()
+    {
+        $result = VersionUtils::parseVersion('1.7.8.11');
+        $this->assertEquals('1.7.8.11', $result['base']);
+        $this->assertEquals(null, $result['stability']);
+        $this->assertEquals(null, $result['distribution']);
+    }
+
+    public function testParseVersionClassicStandardVersion()
     {
         $result = VersionUtils::parseVersion('9.0.0-0.1');
         $this->assertEquals('9.0.0', $result['base']);
-        $this->assertEquals('0.1', $result['distribution']);
-    }
-
-    public function testParseVersionStandardVersionWithClassicBefore()
-    {
-        $result = VersionUtils::parseVersion('classic-9.0.0-0.1');
-        $this->assertEquals('9.0.0', $result['base']);
-        $this->assertEquals('0.1', $result['distribution']);
-    }
-
-    public function testParseVersionStandardVersionWithClassicAfter()
-    {
-        $result = VersionUtils::parseVersion('9.0.0-0.1-classic');
-        $this->assertEquals('9.0.0', $result['base']);
+        $this->assertEquals(null, $result['stability']);
         $this->assertEquals('0.1', $result['distribution']);
     }
 
@@ -124,20 +126,23 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
     {
         $result = VersionUtils::parseVersion('8.2.1-1.5');
         $this->assertEquals('8.2.1', $result['base']);
+        $this->assertEquals(null, $result['stability']);
         $this->assertEquals('1.5', $result['distribution']);
     }
 
     public function testParseVersionBetaVersion()
     {
-        $result = VersionUtils::parseVersion('9.0.0-beta.1-1.0');
-        $this->assertEquals('9.0.0-beta.1', $result['base']);
+        $result = VersionUtils::parseVersion('9.0.0-1.0-beta.1');
+        $this->assertEquals('9.0.0', $result['base']);
+        $this->assertEquals('beta.1', $result['stability']);
         $this->assertEquals('1.0', $result['distribution']);
     }
 
     public function testParseVersionRcVersion()
     {
-        $result = VersionUtils::parseVersion('9.0.0-rc.1-1.0');
-        $this->assertEquals('9.0.0-rc.1', $result['base']);
+        $result = VersionUtils::parseVersion('9.0.0-1.0-rc.1');
+        $this->assertEquals('9.0.0', $result['base']);
+        $this->assertEquals('rc.1', $result['stability']);
         $this->assertEquals('1.0', $result['distribution']);
     }
 
@@ -151,7 +156,7 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
     public function testParseVersionThrowsExceptionOnMissingDistribution(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Incomplete version string "9.0.0-".');
+        $this->expectExceptionMessage('Unable to parse version "9.0.0-".');
         VersionUtils::parseVersion('9.0.0-');
     }
 }

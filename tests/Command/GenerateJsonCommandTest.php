@@ -36,7 +36,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
 
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),
-           $this->createMock(HttpClientInterface::class),
+            $this->createMock(HttpClientInterface::class),
             $githubOsClient,
             $bucket,
             $urlProvider,
@@ -58,7 +58,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
 
         $prestaShopClassicUtils = new PrestaShopClassicUtils(
             $githubClassicClient,
-            $this->createMock(Client::class),
+            $this->createMock(HttpClientInterface::class),
             $bucket,
             $urlProvider,
             $releaseNoteUtils,

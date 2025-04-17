@@ -55,7 +55,7 @@ class PrestaShopUtilsTest extends AbstractMockedGithubClientTestCase
 
         $prestaShopClassicUtil = new PrestaShopClassicUtils(
             $this->createGithubClientMock(PrestaShop::DISTRIBUTION_CLASSIC),
-            $this->createMock(Client::class),
+            $this->createMock(HttpClientInterface::class),
             $this->createMock(Bucket::class),
             new PublicDownloadUrlProvider(''),
             new ReleaseNoteUtils(),

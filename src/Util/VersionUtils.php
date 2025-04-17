@@ -92,55 +92,60 @@ class VersionUtils
         return implode('.', $parts);
     }
 
-    public static function removeClassicInVersionTag(string $version): string
-    {
-        if (!str_contains($version, PrestaShop::DISTRIBUTION_CLASSIC)) {
-            return $version;
-        }
-
-        return preg_replace('/^(classic-?)|(-?classic)$/i', '', $version) ?? $version;
-    }
-
     /**
-     * @param string $version the full version string to parse
+     * Parses a version string into base, stability tag, and distribution version.
+     *
+     * Examples:
+     *   - 9.0.0-1.0            → base: 9.0.0, stability: null, distribution: 1.0
+     *   - 9.0.0-1.0-beta.1     → base: 9.0.0, stability: beta.1, distribution: 1.0
+     *   - 9.0.0-beta.1         → base: 9.0.0, stability: beta.1, distribution: null
+     *   - 9.0.0                → base: 9.0.0, stability: null, distribution: null
+     *
+     * @param string $version
      *
      * @return array{
      *     base: string,
-     *     distribution: string
-     * } An associative array containing:
-     *     - 'base': the base version (possibly with a beta/rc tag),
-     *     - 'distribution': the distribution version number
+     *     stability: string|null,
+     *     distribution: string|null
+     * }
      *
-     * @throws InvalidArgumentException if the version string format is not recognized
+     * @throws InvalidArgumentException
      */
-    public static function parseVersion($version): array
+    public static function parseVersion(string $version): array
     {
-        $version = self::removeClassicInVersionTag($version);
+        $base = null;
+        $stability = null;
+        $distribution = null;
 
-        $lastDashPos = strrpos($version, '-');
-
-        if ($lastDashPos === false) {
-            throw new InvalidArgumentException(sprintf('Unable to parse version "%s".', $version));
+        // Match with distribution and optional stability (e.g. 9.0.0-1.0-beta.1)
+        if (preg_match('/^([\d\.]+)-([\d\.]+)-(beta|rc)\.(\d+)$/', $version, $matches)) {
+            $base = $matches[1];
+            $distribution = $matches[2];
+            $stability = $matches[3] . '.' . $matches[4];
+        }
+        // Match with distribution only
+        elseif (preg_match('/^([\d\.]+)-([\d\.]+)$/', $version, $matches)) {
+            $base = $matches[1];
+            $distribution = $matches[2];
+        }
+        // Match with stability only (e.g. 9.0.0-beta.1)
+        elseif (preg_match('/^([\d\.]+)-(beta|rc)\.(\d+)$/', $version, $matches)) {
+            $base = $matches[1];
+            $stability = $matches[2] . '.' . $matches[3];
+        }
+        // Match base only (e.g. 9.0.0 or 1.6.1.24)
+        elseif (preg_match('/^\d+(?:\.\d+){2,}$/', $version)) {
+            $base = $version;
         }
 
-        $baseVersion = substr($version, 0, $lastDashPos);
-        $distVersion = substr($version, $lastDashPos + 1);
-
-        // Validate both parts with simple regex
-        if (
-            !preg_match('/^\d+\.\d+\.\d+(-(?:beta|rc)\.\d+)?$/', $baseVersion)
-            && !preg_match('/^\d+\.\d+\.\d+-[a-z]+\.\d+$/', $baseVersion)
-        ) {
+        if ($base === null) {
             throw new InvalidArgumentException(sprintf('Unable to parse version "%s".', $version));
-        }
-
-        if (!preg_match('/^\d+\.\d+$/', $distVersion)) {
-            throw new InvalidArgumentException(sprintf('Incomplete version string "%s".', $version));
         }
 
         return [
-            'base' => $baseVersion,
-            'distribution' => $distVersion,
+            'base' => $base,
+            'stability' => $stability,
+            'distribution' => $distribution,
         ];
     }
 }
