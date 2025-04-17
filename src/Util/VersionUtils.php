@@ -16,7 +16,7 @@ class VersionUtils
      *
      * @return PrestaShop|null
      */
-    public function getHighestStableVersionFromList(array $list = []): ?Prestashop
+    public function getHighestStableVersionFromList(array $list = []): ?PrestaShop
     {
         if (empty($list)) {
             return null;
@@ -25,8 +25,8 @@ class VersionUtils
         // Get highest version available
         $highestVersion = null;
         foreach ($list as $version) {
-            if (($highestVersion === null || version_compare($version->getVersion(), $highestVersion->getVersion(), '>')) &&
-              $version->isStable()) {
+            if (($highestVersion === null || version_compare($version->getVersion(), $highestVersion->getVersion(), '>'))
+              && $version->isStable()) {
                 $highestVersion = $version;
             }
         }
@@ -42,7 +42,7 @@ class VersionUtils
      *
      * @return PrestaShop|null
      */
-    public function getHighestStablePreviousVersionFromList(array $list = []): ?Prestashop
+    public function getHighestStablePreviousVersionFromList(array $list = []): ?PrestaShop
     {
         if (empty($list)) {
             return null;
@@ -57,9 +57,9 @@ class VersionUtils
         $possiblePreviousMajor = $highestVersion->getMajorVersionNumber() - 1;
         $highestPreviousVersion = null;
         foreach ($list as $version) {
-            if (($highestPreviousVersion === null || version_compare($version->getVersion(), $highestPreviousVersion->getVersion(), '>')) &&
-                $version->getMajorVersionNumber() == $possiblePreviousMajor &&
-                $version->isStable()) {
+            if (($highestPreviousVersion === null || version_compare($version->getVersion(), $highestPreviousVersion->getVersion(), '>'))
+                && $version->getMajorVersionNumber() == $possiblePreviousMajor
+                && $version->isStable()) {
                 $highestPreviousVersion = $version;
             }
         }
