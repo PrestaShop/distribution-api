@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Util;
 
 use App\Model\PrestaShop;
+use InvalidArgumentException;
 
 class VersionUtils
 {
@@ -89,5 +90,62 @@ class VersionUtils
         $parts = array_pad($parts, 3, '0');
 
         return implode('.', $parts);
+    }
+
+    /**
+     * Parses a version string into base, stability tag, and distribution version.
+     *
+     * Examples:
+     *   - 9.0.0-1.0            → base: 9.0.0, stability: null, distribution: 1.0
+     *   - 9.0.0-1.0-beta.1     → base: 9.0.0, stability: beta.1, distribution: 1.0
+     *   - 9.0.0-beta.1         → base: 9.0.0, stability: beta.1, distribution: null
+     *   - 9.0.0                → base: 9.0.0, stability: null, distribution: null
+     *
+     * @param string $version
+     *
+     * @return array{
+     *     base: string,
+     *     stability: string|null,
+     *     distribution: string|null
+     * }
+     *
+     * @throws InvalidArgumentException
+     */
+    public static function parseVersion(string $version): array
+    {
+        $base = null;
+        $stability = null;
+        $distribution = null;
+
+        // Match with distribution and optional stability (e.g. 9.0.0-1.0-beta.1)
+        if (preg_match('/^([\d\.]+)-([\d\.]+)-(beta|rc)\.(\d+)$/', $version, $matches)) {
+            $base = $matches[1];
+            $distribution = $matches[2];
+            $stability = $matches[3] . '.' . $matches[4];
+        }
+        // Match with distribution only
+        elseif (preg_match('/^([\d\.]+)-([\d\.]+)$/', $version, $matches)) {
+            $base = $matches[1];
+            $distribution = $matches[2];
+        }
+        // Match with stability only (e.g. 9.0.0-beta.1)
+        elseif (preg_match('/^([\d\.]+)-(beta|rc)\.(\d+)$/', $version, $matches)) {
+            $base = $matches[1];
+            $stability = $matches[2] . '.' . $matches[3];
+        }
+        // Match base only (e.g. 9.0.0 or 1.6.1.24)
+        elseif (preg_match('/^\d+(?:\.\d+){2,}$/', $version)) {
+            $base = $version;
+        }
+
+        if ($base === null) {
+            throw new InvalidArgumentException(sprintf('Unable to parse version "%s".', $version));
+        }
+
+        return [
+            'base' => $base,
+            'stability' => $stability,
+            'distribution' => $distribution,
+        ];
     }
 }

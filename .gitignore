@@ -1,4 +1,5 @@
 vendor/
+public/json/modules
 public/json/prestashop
 public/json/prestashop.json
 !public/json/.gitkeep

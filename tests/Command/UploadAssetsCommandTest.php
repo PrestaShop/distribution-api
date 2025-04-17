@@ -22,6 +22,7 @@ class UploadAssetsCommandTest extends AbstractCommandTestCase
             $this->bucketMock,
             __DIR__ . '/../ressources/json',
             __DIR__ . '/../ressources/prestashop',
+            __DIR__ . '/../ressources/prestashop-classic',
             __DIR__ . '/../ressources/modules'
         );
     }
@@ -37,6 +38,10 @@ class UploadAssetsCommandTest extends AbstractCommandTestCase
             [$this->anything(), ['name' => 'assets/prestashop/1.7.8.0-rc.1/prestashop.zip']],
             [$this->anything(), ['name' => 'assets/prestashop/1.7.8.1/prestashop.xml']],
             [$this->anything(), ['name' => 'assets/prestashop/1.7.8.1/prestashop.zip']],
+            [$this->anything(), ['name' => 'assets/prestashop/9.0.0/prestashop.xml']],
+            [$this->anything(), ['name' => 'assets/prestashop/9.0.0/prestashop.zip']],
+            [$this->anything(), ['name' => 'assets/prestashop-classic/9.0.0-0.2/prestashop.xml']],
+            [$this->anything(), ['name' => 'assets/prestashop-classic/9.0.0-0.2/prestashop.zip']],
             [$this->anything(), ['name' => 'assets/modules/psgdpr/v1.3.0/logo.png']],
             [$this->anything(), ['name' => 'assets/modules/psgdpr/v1.3.0/psgdpr.zip']],
             [$this->anything(), ['name' => 'modules/1.6.1.24.json']],
@@ -52,7 +57,7 @@ class UploadAssetsCommandTest extends AbstractCommandTestCase
             [$this->anything(), ['name' => 'prestashop/stable.json']],
         ];
 
-        $this->output->expects($this->exactly(count($parameters) + 1))->method('writeln');
+        $this->output->expects($this->exactly(count($parameters) + 2))->method('writeln');
         $this->bucketMock->expects($this->any())->method('upload')->withConsecutive(...$parameters);
 
         $this->command->execute($this->input, $this->output);

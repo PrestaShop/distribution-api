@@ -14,24 +14,36 @@ class DownloadNewPrestaShopReleasesCommand extends Command
 {
     protected static $defaultName = 'downloadNewPrestaShopReleases';
 
-    private PrestaShopUtils $prestaShopUtils;
+    private PrestaShopUtils $prestaShopOsUtils;
+    private PrestaShopUtils $prestaShopClassicUtils;
 
-    public function __construct(PrestaShopUtils $prestaShopUtils)
+    public function __construct(PrestaShopUtils $prestaShopOpenSourceUtils, PrestaShopUtils $prestaShopClassicUtils)
     {
         parent::__construct();
-        $this->prestaShopUtils = $prestaShopUtils;
+        $this->prestaShopOsUtils = $prestaShopOpenSourceUtils;
+        $this->prestaShopClassicUtils = $prestaShopClassicUtils;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $prestaShopVersions = $this->prestaShopUtils->getVersions();
-        $output->writeln(sprintf('<info>%d PrestaShop releases found</info>', count($prestaShopVersions)));
+        $prestaShopOsVersions = $this->prestaShopOsUtils->getVersions();
+        $output->writeln(sprintf('<info>%d PrestaShop Open source releases found</info>', count($prestaShopOsVersions)));
 
-        $prestaShopVersions = $this->removeAlreadyAvailableVersions($prestaShopVersions);
+        $prestaShopOsVersions = $this->removeAlreadyAvailableVersions($prestaShopOsVersions, $this->prestaShopOsUtils);
 
-        foreach ($prestaShopVersions as $prestaShopVersion) {
+        foreach ($prestaShopOsVersions as $prestaShopVersion) {
             $output->writeln(sprintf('<info>Downloading PrestaShop %s</info>', $prestaShopVersion->getVersion()));
-            $this->prestaShopUtils->download($prestaShopVersion);
+            $this->prestaShopOsUtils->download($prestaShopVersion);
+        }
+
+        $prestaShopClassicVersions = $this->prestaShopClassicUtils->getVersions();
+        $output->writeln(sprintf('<info>%d PrestaShop Classic releases found</info>', count($prestaShopClassicVersions)));
+
+        $prestaShopClassicVersions = $this->removeAlreadyAvailableVersions($prestaShopClassicVersions, $this->prestaShopClassicUtils);
+
+        foreach ($prestaShopClassicVersions as $prestaShopVersion) {
+            $output->writeln(sprintf('<info>Downloading PrestaShop %s</info>', $prestaShopVersion->getCompleteVersion()));
+            $this->prestaShopClassicUtils->download($prestaShopVersion);
         }
 
         return static::SUCCESS;
@@ -42,11 +54,11 @@ class DownloadNewPrestaShopReleasesCommand extends Command
      *
      * @return PrestaShop[]
      */
-    private function removeAlreadyAvailableVersions(array $prestaShop): array
+    private function removeAlreadyAvailableVersions(array $prestaShop, PrestaShopUtils $prestaShopUtils): array
     {
         $prestaShopVersions = [];
         $alreadyAvailablePrestaShopVersions = array_map(
-            fn ($item) => $item->getVersion(), $this->prestaShopUtils->getVersionsFromBucket()
+            fn ($item) => $item->getVersion(), $prestaShopUtils->getVersionsFromBucket()
         );
 
         foreach ($prestaShop as $ps) {

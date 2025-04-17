@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use App\Model\PrestaShop;
 use Github\Api\Repo;
 use Github\Api\Repository\Contents;
 use Github\Api\Repository\Releases;
@@ -12,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractMockedGithubClientTestCase extends TestCase
 {
-    protected function createGithubClientMock(): Client
+    protected function createGithubClientMock(string $ditribution): Client
     {
         $content = $this->createMock(Contents::class);
         $content->method('show')->willReturnCallback(function ($username, $repo, $filename): array {
@@ -23,7 +24,8 @@ abstract class AbstractMockedGithubClientTestCase extends TestCase
         });
 
         $release = $this->createMock(Releases::class);
-        $release->method('all')->willReturnOnConsecutiveCalls(json_decode(file_get_contents(__DIR__ . '/ressources/stubs/prestashop.json'), true), [], []);
+        $fileName = $ditribution === PrestaShop::DISTRIBUTION_OPEN_SOURCE ? 'prestashop' : 'prestashop-classic';
+        $release->method('all')->willReturnOnConsecutiveCalls(json_decode(file_get_contents(__DIR__ . '/ressources/stubs/' . $fileName . '.json'), true), [], []);
 
         $repo = $this->createMock(Repo::class);
         $repo->method('contents')->willReturn($content);
