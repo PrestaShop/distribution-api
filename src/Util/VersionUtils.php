@@ -117,20 +117,25 @@ class VersionUtils
     {
         $version = self::removeClassicInVersionTag($version);
 
-        $baseVersion = '';
-        $distVersion = '';
+        $lastDashPos = strrpos($version, '-');
 
-        // Check if the version includes a beta or rc tag
-        if (preg_match('/^([\d\.]+)-([\d\.]+)-(beta|rc)\.(\d+)$/', $version, $matches)) {
-            $baseVersion = $matches[1] . '-' . $matches[3] . '.' . $matches[4];
-            $distVersion = $matches[2];
-        }
-        // Case without beta/rc tag
-        elseif (preg_match('/^([\d\.]+)-([\d\.]+)$/', $version, $matches)) {
-            $baseVersion = $matches[1];
-            $distVersion = $matches[2];
-        } else {
+        if ($lastDashPos === false) {
             throw new InvalidArgumentException(sprintf('Unable to parse version "%s".', $version));
+        }
+
+        $baseVersion = substr($version, 0, $lastDashPos);
+        $distVersion = substr($version, $lastDashPos + 1);
+
+        // Validate both parts with simple regex
+        if (
+            !preg_match('/^\d+\.\d+\.\d+(-(?:beta|rc)\.\d+)?$/', $baseVersion)
+            && !preg_match('/^\d+\.\d+\.\d+-[a-z]+\.\d+$/', $baseVersion)
+        ) {
+            throw new InvalidArgumentException(sprintf('Unable to parse version "%s".', $version));
+        }
+
+        if (!preg_match('/^\d+\.\d+$/', $distVersion)) {
+            throw new InvalidArgumentException(sprintf('Incomplete version string "%s".', $version));
         }
 
         return [

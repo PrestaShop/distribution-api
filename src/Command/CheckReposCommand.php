@@ -23,7 +23,7 @@ class CheckReposCommand extends Command
         ModuleUtils $moduleUtils,
         PrestaShopUtils $prestaShopOpenSourceUtils,
         PrestaShopUtils $prestaShopClassicUtils,
-        ) {
+    ) {
         parent::__construct();
         $this->moduleUtils = $moduleUtils;
         $this->prestaShopOpenSourceUtils = $prestaShopOpenSourceUtils;

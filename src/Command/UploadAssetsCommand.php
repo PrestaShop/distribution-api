@@ -31,7 +31,7 @@ class UploadAssetsCommand extends Command
         string $prestaShopOpenSourceDir,
         string $prestaShopClassicDir,
         string $moduleDir,
-         ) {
+    ) {
         parent::__construct();
         $this->bucket = $bucket;
         $this->jsonDir = $jsonDir;

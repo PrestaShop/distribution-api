@@ -106,6 +106,20 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
         $this->assertEquals('0.1', $result['distribution']);
     }
 
+    public function testParseVersionStandardVersionWithClassicBefore()
+    {
+        $result = VersionUtils::parseVersion('classic-9.0.0-0.1');
+        $this->assertEquals('9.0.0', $result['base']);
+        $this->assertEquals('0.1', $result['distribution']);
+    }
+
+    public function testParseVersionStandardVersionWithClassicAfter()
+    {
+        $result = VersionUtils::parseVersion('9.0.0-0.1-classic');
+        $this->assertEquals('9.0.0', $result['base']);
+        $this->assertEquals('0.1', $result['distribution']);
+    }
+
     public function testParseVersionAnotherStandardVersion()
     {
         $result = VersionUtils::parseVersion('8.2.1-1.5');
@@ -115,14 +129,14 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
 
     public function testParseVersionBetaVersion()
     {
-        $result = VersionUtils::parseVersion('9.0.0-1.0-beta.1');
+        $result = VersionUtils::parseVersion('9.0.0-beta.1-1.0');
         $this->assertEquals('9.0.0-beta.1', $result['base']);
         $this->assertEquals('1.0', $result['distribution']);
     }
 
     public function testParseVersionRcVersion()
     {
-        $result = VersionUtils::parseVersion('9.0.0-1.0-rc.1');
+        $result = VersionUtils::parseVersion('9.0.0-rc.1-1.0');
         $this->assertEquals('9.0.0-rc.1', $result['base']);
         $this->assertEquals('1.0', $result['distribution']);
     }
@@ -132,5 +146,12 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to parse version "invalid-version-string".');
         VersionUtils::parseVersion('invalid-version-string');
+    }
+
+    public function testParseVersionThrowsExceptionOnMissingDistribution(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Incomplete version string "9.0.0-".');
+        VersionUtils::parseVersion('9.0.0-');
     }
 }
