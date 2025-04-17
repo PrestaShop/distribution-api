@@ -20,20 +20,20 @@ class CleanCommand extends Command
     private Filesystem $filesystem;
     private string $moduleDir;
     private string $prestaShopOpenSourceDir;
-    private string $prestaShopClassicSourceDir;
+    private string $prestaShopClassicDir;
     private string $jsonDir;
 
     public function __construct(
         string $moduleDir,
         string $prestaShopOpenSourceDir,
-        string $prestaShopClassicSourceDir,
+        string $prestaShopClassicDir,
         string $jsonDir,
     ) {
         parent::__construct();
         $this->filesystem = new Filesystem();
         $this->moduleDir = $moduleDir;
         $this->prestaShopOpenSourceDir = $prestaShopOpenSourceDir;
-        $this->prestaShopClassicSourceDir = $prestaShopClassicSourceDir;
+        $this->prestaShopClassicDir = $prestaShopClassicDir;
         $this->jsonDir = $jsonDir;
     }
 
@@ -81,7 +81,12 @@ class CleanCommand extends Command
     private function cleanJson(OutputInterface $output): void
     {
         if (is_dir($this->jsonDir)) {
-            $this->filesystem->remove((new Finder())->in($this->jsonDir));
+            $finder = (new Finder())
+                ->in($this->jsonDir)
+                ->files()
+                ->notName('autoupgrade.json');
+
+            $this->filesystem->remove($finder);
         }
         $output->writeln('<info>Json folder cleaned</info>');
     }
@@ -99,8 +104,8 @@ class CleanCommand extends Command
         if (is_dir($this->prestaShopOpenSourceDir)) {
             $this->filesystem->remove((new Finder())->in($this->prestaShopOpenSourceDir));
         }
-        if (is_dir($this->prestaShopClassicSourceDir)) {
-            $this->filesystem->remove((new Finder())->in($this->prestaShopClassicSourceDir));
+        if (is_dir($this->prestaShopClassicDir)) {
+            $this->filesystem->remove((new Finder())->in($this->prestaShopClassicDir));
         }
         $output->writeln('<info>PrestaShop folders cleaned</info>');
     }

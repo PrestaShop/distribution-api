@@ -288,8 +288,8 @@ class GenerateJsonCommand extends Command
                 $filtered[$key] = $version;
             // If the current version is "classic" and the existing one isn't, replace it
             } elseif (
-                $version->getDistribution() === PrestaShop::DISTRIBUTION_CLASSIC &&
-                $filtered[$key]->getDistribution() !== PrestaShop::DISTRIBUTION_CLASSIC
+                $version->getDistribution() === PrestaShop::DISTRIBUTION_CLASSIC
+                && $filtered[$key]->getDistribution() !== PrestaShop::DISTRIBUTION_CLASSIC
             ) {
                 $filtered[$key] = $version;
             }

@@ -9,4 +9,4 @@ parameters:
   prestashop_os_repository: 'PrestaShop/PrestaShop'
   prestashop_classic_repository: 'PrestaShopCorp/prestashop-classic'
   prestashop_os_min_version: '1.7.0.0'
-  prestashop_classic_min_version: '9.0.0-0.1'
+  prestashop_classic_min_version: '9.0.0-1.0-beta.1'
