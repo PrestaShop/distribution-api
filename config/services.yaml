@@ -16,6 +16,9 @@ services:
   Symfony\Component\Console\Application:
     public: true
 
+  Symfony\Contracts\HttpClient\HttpClientInterface:
+    factory: [ 'Symfony\Component\HttpClient\HttpClient', 'create' ]
+
   Github\Client:
     calls:
       - authenticate: ['%github_token%', 'access_token_header']
