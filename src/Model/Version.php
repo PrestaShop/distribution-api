@@ -20,7 +20,7 @@ class Version implements JsonSerializable
     private ?string $tab;
     private ?string $description;
 
-    public function __construct(string $tag, string $githubUrl = null)
+    public function __construct(string $tag, ?string $githubUrl = null)
     {
         $this->tag = $tag;
         $this->githubUrl = $githubUrl;

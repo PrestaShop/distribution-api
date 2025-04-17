@@ -37,7 +37,7 @@ class ModuleUtils
         PublicDownloadUrlProvider $publicDownloadUrlProvider,
         string $moduleListRepository,
         string $prestaShopMinVersion,
-        string $moduleDir
+        string $moduleDir,
     ) {
         $this->parser = $moduleParser;
         $this->client = $client;

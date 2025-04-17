@@ -123,50 +123,50 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
     {
         // Pretty normal scenario
         yield [[
-                new Prestashop('8.1.4'),
-                new Prestashop('8.1.3'),
-                new Prestashop('9.0.0'),
-                new Prestashop('9.0.3'),
-                new Prestashop('1.7.8.10'),
-            ], [
-                new Prestashop('8.1.4'),
-                new Prestashop('8.1.3'),
-                new Prestashop('9.0.0'),
-                new Prestashop('9.0.3'),
-                new Prestashop('1.7.8.10'),
-                new Prestashop('10.0.0'),
-                new Prestashop('9.1.0'),
-                new Prestashop('9.0.4'),
-                new Prestashop('8.2.0'),
-                new Prestashop('8.1.5'),
+            new PrestaShop('8.1.4'),
+            new PrestaShop('8.1.3'),
+            new PrestaShop('9.0.0'),
+            new PrestaShop('9.0.3'),
+            new PrestaShop('1.7.8.10'),
+        ], [
+            new PrestaShop('8.1.4'),
+            new PrestaShop('8.1.3'),
+            new PrestaShop('9.0.0'),
+            new PrestaShop('9.0.3'),
+            new PrestaShop('1.7.8.10'),
+            new PrestaShop('10.0.0'),
+            new PrestaShop('9.1.0'),
+            new PrestaShop('9.0.4'),
+            new PrestaShop('8.2.0'),
+            new PrestaShop('8.1.5'),
         ]];
         // Scenario to avoid adding 1.7 versions as a previous major
         yield [[
-            new Prestashop('8.1.4'),
-            new Prestashop('8.1.3'),
-            new Prestashop('1.7.8.10'),
+            new PrestaShop('8.1.4'),
+            new PrestaShop('8.1.3'),
+            new PrestaShop('1.7.8.10'),
         ], [
-            new Prestashop('8.1.4'),
-            new Prestashop('8.1.3'),
-            new Prestashop('1.7.8.10'),
-            new Prestashop('9.0.0'),
-            new Prestashop('8.2.0'),
-            new Prestashop('8.1.5'),
+            new PrestaShop('8.1.4'),
+            new PrestaShop('8.1.3'),
+            new PrestaShop('1.7.8.10'),
+            new PrestaShop('9.0.0'),
+            new PrestaShop('8.2.0'),
+            new PrestaShop('8.1.5'),
         ]];
         // Scenario to avoid considering beta as a stable channel
         yield [[
-            new Prestashop('8.1.4'),
-            new Prestashop('8.1.3'),
-            new Prestashop('9.0.0-beta'),
-            new Prestashop('1.7.8.10'),
+            new PrestaShop('8.1.4'),
+            new PrestaShop('8.1.3'),
+            new PrestaShop('9.0.0-beta'),
+            new PrestaShop('1.7.8.10'),
         ], [
-            new Prestashop('8.1.4'),
-            new Prestashop('8.1.3'),
-            new Prestashop('9.0.0-beta'),
-            new Prestashop('1.7.8.10'),
-            new Prestashop('9.0.0'),
-            new Prestashop('8.2.0'),
-            new Prestashop('8.1.5'),
+            new PrestaShop('8.1.4'),
+            new PrestaShop('8.1.3'),
+            new PrestaShop('9.0.0-beta'),
+            new PrestaShop('1.7.8.10'),
+            new PrestaShop('9.0.0'),
+            new PrestaShop('8.2.0'),
+            new PrestaShop('8.1.5'),
         ]];
     }
 }

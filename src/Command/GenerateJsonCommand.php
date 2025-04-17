@@ -27,7 +27,7 @@ class GenerateJsonCommand extends Command
     public function __construct(
         ModuleUtils $moduleUtils,
         PrestaShopUtils $prestaShopUtils,
-        string $jsonDir
+        string $jsonDir,
     ) {
         parent::__construct();
         $this->moduleUtils = $moduleUtils;
@@ -107,7 +107,7 @@ class GenerateJsonCommand extends Command
     private function generatePrestaShopModulesJson(
         ModuleCollection $modules,
         array $prestashopVersions,
-        OutputInterface $output
+        OutputInterface $output,
     ): void {
         $infos = [];
 

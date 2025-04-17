@@ -21,7 +21,7 @@ class ModuleUtilsTest extends AbstractMockedGithubClientTestCase
         string $minPrestaShopVersion,
         string $moduleName,
         string $moduleVersion,
-        bool $expected
+        bool $expected,
     ): void {
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),

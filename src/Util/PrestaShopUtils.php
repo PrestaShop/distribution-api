@@ -309,12 +309,12 @@ class PrestaShopUtils
     private function nodeHasDefine(Stmt $node, string $define): bool
     {
         if (
-            $node instanceof Stmt\Expression &&
-            $node->expr instanceof FuncCall &&
-            $node->expr->name instanceof Name &&
-            $node->expr->name->parts[0] === 'define' &&
-            $node->expr->getArgs()[0]->value instanceof String_ &&
-            $node->expr->getArgs()[0]->value->value === $define
+            $node instanceof Stmt\Expression
+            && $node->expr instanceof FuncCall
+            && $node->expr->name instanceof Name
+            && $node->expr->name->parts[0] === 'define'
+            && $node->expr->getArgs()[0]->value instanceof String_
+            && $node->expr->getArgs()[0]->value->value === $define
         ) {
             return true;
         }
@@ -325,9 +325,9 @@ class PrestaShopUtils
     private function getDefineValue(Stmt $node): string
     {
         if (
-            !$node instanceof Stmt\Expression ||
-            !$node->expr instanceof FuncCall ||
-            !$node->expr->getArgs()[1]->value instanceof String_
+            !$node instanceof Stmt\Expression
+            || !$node->expr instanceof FuncCall
+            || !$node->expr->getArgs()[1]->value instanceof String_
         ) {
             return '';
         }
