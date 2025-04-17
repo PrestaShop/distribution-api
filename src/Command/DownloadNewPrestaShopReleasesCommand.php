@@ -42,7 +42,7 @@ class DownloadNewPrestaShopReleasesCommand extends Command
         $prestaShopClassicVersions = $this->removeAlreadyAvailableVersions($prestaShopClassicVersions, $this->prestaShopClassicUtils);
 
         foreach ($prestaShopClassicVersions as $prestaShopVersion) {
-            $output->writeln(sprintf('<info>Downloading PrestaShop %s</info>', $prestaShopVersion->getVersion()));
+            $output->writeln(sprintf('<info>Downloading PrestaShop %s</info>', $prestaShopVersion->getCompleteVersion()));
             $this->prestaShopClassicUtils->download($prestaShopVersion);
         }
 
