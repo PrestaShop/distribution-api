@@ -8,7 +8,6 @@ use App\Exception\NoAssetException;
 use App\Model\PrestaShop;
 use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
@@ -16,6 +15,7 @@ use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 use ZipArchive;
 

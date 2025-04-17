@@ -9,10 +9,10 @@ use App\Model\Version;
 use App\ModuleCollection;
 use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Psssst\ModuleParser;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use ZipArchive;
 
 class ModuleUtils
