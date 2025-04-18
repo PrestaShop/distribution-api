@@ -6,7 +6,6 @@
     "require": {
         "php": "^8.0",
         "ext-zip": "*",
-        "guzzlehttp/guzzle": "^7.9",
         "prestashop/psssst": "^1.2",
         "symfony/config": "^5.3",
         "symfony/console": "^5.3",
