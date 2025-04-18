@@ -10,10 +10,10 @@ use App\Util\PublicDownloadUrlProvider;
 use Github\Api\Repository\Contents;
 use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
-use GuzzleHttp\Client;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psssst\ModuleParser;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class UpdateModuleConfigFilesCommandTest extends AbstractCommandTestCase
 {
@@ -32,7 +32,7 @@ class UpdateModuleConfigFilesCommandTest extends AbstractCommandTestCase
 
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),
-            $this->createMock(Client::class),
+            $this->createMock(HttpClientInterface::class),
             $this->githubClient,
             $this->createMock(Bucket::class),
             new PublicDownloadUrlProvider(''),

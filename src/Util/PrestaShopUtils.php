@@ -8,7 +8,6 @@ use App\Exception\NoAssetException;
 use App\Model\PrestaShop;
 use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
-use GuzzleHttp\Client;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
 use PhpParser\Node\Scalar\String_;
@@ -16,13 +15,16 @@ use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\Response\StreamableInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 use ZipArchive;
 
 class PrestaShopUtils
 {
     private GithubClient $githubClient;
-    private Client $client;
+    private HttpClientInterface $client;
     private Bucket $bucket;
     private PublicDownloadUrlProvider $publicDownloadUrlProvider;
     private ReleaseNoteUtils $releaseNoteUtils;
@@ -36,7 +38,7 @@ class PrestaShopUtils
 
     public function __construct(
         GithubClient $githubClient,
-        Client $client,
+        HttpClientInterface $client,
         Bucket $bucket,
         PublicDownloadUrlProvider $publicDownloadUrlProvider,
         ReleaseNoteUtils $releaseNoteUtils,
@@ -52,6 +54,9 @@ class PrestaShopUtils
         $this->prestaShopDir = $prestaShopDir;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     public function download(PrestaShop $prestaShop): void
     {
         $path = $this->prestaShopDir . '/' . $prestaShop->getVersion();
@@ -63,12 +68,14 @@ class PrestaShopUtils
             throw new RuntimeException(sprintf('Unable to download PrestaShop %s zip because it has no Github url', $prestaShop->getVersion()));
         }
 
-        $response = $this->client->get($prestaShop->getGithubZipUrl());
-        file_put_contents($path . '/prestashop.zip', $response->getBody());
+        /** @var StreamableInterface $response */
+        $response = $this->client->request('GET', $prestaShop->getGithubZipUrl());
+        file_put_contents($path . '/prestashop.zip', $response->toStream());
 
         if ($prestaShop->getGithubXmlUrl() !== null) {
-            $response = $this->client->get($prestaShop->getGithubXmlUrl());
-            file_put_contents($path . '/prestashop.xml', $response->getBody());
+            /** @var StreamableInterface $response */
+            $response = $this->client->request('GET', $prestaShop->getGithubXmlUrl());
+            file_put_contents($path . '/prestashop.xml', $response->toStream());
         }
     }
 
