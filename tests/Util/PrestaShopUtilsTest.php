@@ -8,7 +8,7 @@ use App\Util\PrestaShopUtils;
 use App\Util\PublicDownloadUrlProvider;
 use App\Util\ReleaseNoteUtils;
 use Google\Cloud\Storage\Bucket;
-use GuzzleHttp\Client;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Tests\AbstractMockedGithubClientTestCase;
 
 class PrestaShopUtilsTest extends AbstractMockedGithubClientTestCase
@@ -20,7 +20,7 @@ class PrestaShopUtilsTest extends AbstractMockedGithubClientTestCase
     {
         $prestaShopUtil = new PrestaShopUtils(
             $this->createGithubClientMock(),
-            $this->createMock(Client::class),
+            $this->createMock(HttpClientInterface::class),
             $this->createMock(Bucket::class),
             new PublicDownloadUrlProvider(''),
             new ReleaseNoteUtils(),
