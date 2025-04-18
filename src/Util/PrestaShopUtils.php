@@ -15,6 +15,8 @@ use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\Response\StreamableInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 use ZipArchive;
@@ -52,6 +54,9 @@ class PrestaShopUtils
         $this->prestaShopDir = $prestaShopDir;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     public function download(PrestaShop $prestaShop): void
     {
         $path = $this->prestaShopDir . '/' . $prestaShop->getVersion();
@@ -63,10 +68,12 @@ class PrestaShopUtils
             throw new RuntimeException(sprintf('Unable to download PrestaShop %s zip because it has no Github url', $prestaShop->getVersion()));
         }
 
+        /** @var StreamableInterface $response */
         $response = $this->client->request('GET', $prestaShop->getGithubZipUrl());
         file_put_contents($path . '/prestashop.zip', $response->toStream());
 
         if ($prestaShop->getGithubXmlUrl() !== null) {
+            /** @var StreamableInterface $response */
             $response = $this->client->request('GET', $prestaShop->getGithubXmlUrl());
             file_put_contents($path . '/prestashop.xml', $response->toStream());
         }

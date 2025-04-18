@@ -111,6 +111,7 @@ class ModuleUtils
             mkdir($path, 0777, true);
         }
 
+        /** @var \Symfony\Component\HttpClient\Response\StreamableInterface $response */
         $response = $this->client->request('GET', sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName));
         file_put_contents($path . '/' . $moduleName . '.php', $response->toStream());
     }
@@ -126,6 +127,7 @@ class ModuleUtils
             throw new RuntimeException(sprintf('Unable to download %s %s because it has no Github url', $moduleName, $version->getTag()));
         }
 
+        /** @var \Symfony\Component\HttpClient\Response\StreamableInterface $response */
         $response = $this->client->request('GET', $version->getGithubUrl());
         file_put_contents($path . '/' . $moduleName . '.zip', $response->toStream());
     }
