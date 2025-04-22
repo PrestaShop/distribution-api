@@ -47,4 +47,4 @@ jobs:
 
       - name: Run scripts to update bucket
         run: |
-          TOKEN=${{secrets.ACCESS_TOKEN}} php bin/console run
+          TOKEN=${{secrets.ACCESS_TOKEN}} BUCKET_NAME=${{secrets.INTEGRATION_GOOGLE_BUCKET}} php bin/console run
