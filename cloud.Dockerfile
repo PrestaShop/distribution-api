@@ -13,7 +13,7 @@ WORKDIR /var/www/html
 COPY --from=builder /app/ /var/www/html
 
 RUN echo "<?php echo 'Healthcheck';" > /var/www/html/index.php
-RUN echo "<?php \$output = shell_exec('bin/console run'); echo '<pre>'.\$output.'</pre>';" > /var/www/html/run.php
+RUN echo "<?php system('bin/console run');" > /var/www/html/run.php
 
 RUN chown -R www-data:www-data /var/www
 
