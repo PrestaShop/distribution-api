@@ -11,10 +11,10 @@ use App\Util\PrestaShopUtils;
 use App\Util\PublicDownloadUrlProvider;
 use App\Util\ReleaseNoteUtils;
 use Google\Cloud\Storage\Bucket;
-use GuzzleHttp\Client;
 use Psssst\ModuleParser;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GenerateJsonCommandTest extends AbstractCommandTestCase
 {
@@ -33,7 +33,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
 
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),
-            $this->createMock(Client::class),
+            $this->createMock(HttpClientInterface::class),
             $githubClient,
             $bucket,
             $urlProvider,
@@ -43,7 +43,7 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
         );
         $prestaShopUtils = new PrestaShopUtils(
             $githubClient,
-            $this->createMock(Client::class),
+            $this->createMock(HttpClientInterface::class),
             $bucket,
             $urlProvider,
             new ReleaseNoteUtils(),

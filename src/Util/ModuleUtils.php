@@ -9,10 +9,10 @@ use App\Model\Version;
 use App\ModuleCollection;
 use Github\Client as GithubClient;
 use Google\Cloud\Storage\Bucket;
-use GuzzleHttp\Client;
 use Psssst\ModuleParser;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use ZipArchive;
 
 class ModuleUtils
@@ -21,7 +21,7 @@ class ModuleUtils
     private const GITHUB_MAIN_CLASS_ENDPOINT = 'https://raw.githubusercontent.com/PrestaShop/%s/%s/%s.php';
 
     private ModuleParser $parser;
-    private Client $client;
+    private HttpClientInterface $client;
     private GithubClient $githubClient;
     private Bucket $bucket;
     private PublicDownloadUrlProvider $publicDownloadUrlProvider;
@@ -31,7 +31,7 @@ class ModuleUtils
 
     public function __construct(
         ModuleParser $moduleParser,
-        Client $client,
+        HttpClientInterface $client,
         GithubClient $githubClient,
         Bucket $bucket,
         PublicDownloadUrlProvider $publicDownloadUrlProvider,
@@ -111,8 +111,9 @@ class ModuleUtils
             mkdir($path, 0777, true);
         }
 
-        $response = $this->client->get(sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName), ['stream' => true]);
-        file_put_contents($path . '/' . $moduleName . '.php', $response->getBody());
+        /** @var \Symfony\Component\HttpClient\Response\StreamableInterface $response */
+        $response = $this->client->request('GET', sprintf(self::GITHUB_MAIN_CLASS_ENDPOINT, $moduleName, $version->getTag(), $moduleName));
+        file_put_contents($path . '/' . $moduleName . '.php', $response->toStream());
     }
 
     public function download(string $moduleName, Version $version): void
@@ -126,8 +127,9 @@ class ModuleUtils
             throw new RuntimeException(sprintf('Unable to download %s %s because it has no Github url', $moduleName, $version->getTag()));
         }
 
-        $response = $this->client->get($version->getGithubUrl(), ['stream' => true]);
-        file_put_contents($path . '/' . $moduleName . '.zip', $response->getBody());
+        /** @var \Symfony\Component\HttpClient\Response\StreamableInterface $response */
+        $response = $this->client->request('GET', $version->getGithubUrl());
+        file_put_contents($path . '/' . $moduleName . '.zip', $response->toStream());
     }
 
     public function extractLogo(string $moduleName, Version $version): void

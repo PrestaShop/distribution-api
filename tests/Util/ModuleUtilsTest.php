@@ -8,8 +8,8 @@ use App\Model\Version;
 use App\Util\ModuleUtils;
 use App\Util\PublicDownloadUrlProvider;
 use Google\Cloud\Storage\Bucket;
-use GuzzleHttp\Client;
 use Psssst\ModuleParser;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Tests\AbstractMockedGithubClientTestCase;
 
 class ModuleUtilsTest extends AbstractMockedGithubClientTestCase
@@ -25,7 +25,7 @@ class ModuleUtilsTest extends AbstractMockedGithubClientTestCase
     ): void {
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),
-            $this->createMock(Client::class),
+            $this->createMock(HttpClientInterface::class),
             $this->createGithubClientMock(),
             $this->createMock(Bucket::class),
             new PublicDownloadUrlProvider(''),
