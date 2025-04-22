@@ -15,6 +15,12 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'integration-deployment')
 
     steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, intl, gd, xml, dom, json, fileinfo, curl, zip, iconv, simplexml
+
       - name: Checkout the repository 🎁
         uses: actions/checkout@v4
 
@@ -36,19 +42,9 @@ jobs:
         id: get_tag
         run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      - name: Build and publish Dockerfile 📦
-        run: |
-          docker build -f cloud.Dockerfile \
-          --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest" \
-          --tag="europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}" .
-          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:latest
-          docker push europe-west1-docker.pkg.dev/core-oss-integration/distribution-api/distribution-api:${{ steps.get_tag.outputs.TAG }}
+      - name: Install dependencies
+        run: composer install
 
-      - name: Trigger deploy 🚀
-        uses: the-actions-org/workflow-dispatch@v4
-        with:
-          workflow: deployment-integration.yml
-          repo: PrestaShopCorp/terraform-core-oss-distribution-api
-          token: ${{ secrets.ACCESS_TOKEN }}
-          ref: 'refs/heads/main'
-          inputs: '{ "version": "${{ steps.get_tag.outputs.TAG }}" }'
+      - name: Run scripts to update bucket
+        run: |
+          TOKEN=${{secrets.ACCESS_TOKEN}} php bin/console run
