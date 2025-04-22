@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Util\VersionUtils;
 use InvalidArgumentException;
 use JsonSerializable;
 
@@ -19,6 +20,7 @@ class PrestaShop implements JsonSerializable
 
     private string $version;
     private string $distribution;
+    private ?string $distributionVersion = null;
     private ?string $minPhpVersion = null;
     private ?string $maxPhpVersion = null;
     private ?string $githubZipUrl = null;
@@ -28,7 +30,7 @@ class PrestaShop implements JsonSerializable
     private ?string $zipMD5 = null;
     private ?string $releaseNoteUrl = null;
 
-    public function __construct(string $version, string $distribution = self::DISTRIBUTION_OPEN_SOURCE)
+    public function __construct(string $version, string $distribution = self::DISTRIBUTION_OPEN_SOURCE, ?string $distributionVersion = null)
     {
         if (!in_array($distribution, self::DISTRIBUTIONS_LIST)) {
             $distributions = array_map(fn ($f) => sprintf('"%s"', $f), self::DISTRIBUTIONS_LIST);
@@ -37,6 +39,7 @@ class PrestaShop implements JsonSerializable
 
         $this->version = $version;
         $this->distribution = $distribution;
+        $this->distributionVersion = $distributionVersion;
     }
 
     public function getVersion(): string
@@ -47,6 +50,25 @@ class PrestaShop implements JsonSerializable
     public function getDistribution(): string
     {
         return $this->distribution;
+    }
+
+    public function getDistributionVersion(): ?string
+    {
+        return $this->distributionVersion;
+    }
+
+    public function getCompleteVersion(): string
+    {
+        $version = VersionUtils::parseVersion($this->getVersion());
+        $distributionVersion = $this->getDistributionVersion() ? '-' . $this->getDistributionVersion() : '';
+        $stabilityVersion = $version['stability'] ? '-' . $version['stability'] : '';
+
+        return $version['base'] . $distributionVersion . $stabilityVersion;
+    }
+
+    public function setDistributionVersion(?string $distributionVersion): void
+    {
+        $this->distributionVersion = $distributionVersion;
     }
 
     public function getNextMajorVersion(): string
@@ -198,7 +220,7 @@ class PrestaShop implements JsonSerializable
     /**
      * @return self::CHANNEL_*
      */
-    private function getStability(): string
+    public function getStability(): string
     {
         if ($this->isStable()) {
             return self::CHANNEL_STABLE;
@@ -225,6 +247,7 @@ class PrestaShop implements JsonSerializable
         return [
             'version' => $this->getVersion(),
             'distribution' => $this->getDistribution(),
+            'distribution_version' => $this->getDistributionVersion(),
             'php_max_version' => $this->getMaxPhpVersion(),
             'php_min_version' => $this->getMinPhpVersion(),
             'zip_download_url' => $this->getZipDownloadUrl(),

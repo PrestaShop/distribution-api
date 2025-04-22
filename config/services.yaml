@@ -8,9 +8,7 @@ services:
     bind:
       $jsonDir: '%kernel.project_dir%/public/json'
       $moduleDir: '%kernel.project_dir%/var/tmp/modules'
-      $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop'
       $moduleListRepository: '%module_list_repository%'
-      $prestaShopMinVersion: '%prestashop_min_version%'
       $publicAssetsBaseUrl: '%public_assets_base_url%'
 
   Symfony\Component\Console\Application:
@@ -35,7 +33,34 @@ services:
 
   App\Util\:
     resource: '../src/Util/*'
+    exclude:
+      - '../src/Util/PrestaShopUtils.php'
+      - '../src/Util/PrestaShopOpenSourceUtils.php'
+      - '../src/Util/PrestaShopClassicUtils.php'
+      - '../src/Util/ModuleUtils.php'
+
+  App\Util\PrestaShopOpenSourceUtils:
+    arguments:
+        $repositoryFullName: '%prestashop_os_repository%'
+        $prestaShopMinVersion: '%prestashop_os_min_version%'
+        $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop-open-source'
+
+  App\Util\PrestaShopClassicUtils:
+    arguments:
+        $repositoryFullName: '%prestashop_classic_repository%'
+        $prestaShopMinVersion: '%prestashop_classic_min_version%'
+        $prestaShopDir: '%kernel.project_dir%/var/tmp/prestashop-classic'
+
+  App\Util\ModuleUtils:
+    arguments:
+        $prestaShopMinVersion: '%prestashop_os_min_version%'
 
   App\Command\:
     resource: '../src/Command/*'
     tags: ['console.command']
+    bind:
+      $prestaShopOpenSourceUtils: '@App\Util\PrestaShopOpenSourceUtils'
+      $prestaShopClassicUtils: '@App\Util\PrestaShopClassicUtils'
+      $moduleUtils: '@App\Util\ModuleUtils'
+      $prestaShopOpenSourceDir: '%kernel.project_dir%/var/tmp/prestashop-open-source'
+      $prestaShopClassicDir: '%kernel.project_dir%/var/tmp/prestashop-classic'

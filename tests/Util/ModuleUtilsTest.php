@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Util;
 
+use App\Model\PrestaShop;
 use App\Model\Version;
 use App\Util\ModuleUtils;
 use App\Util\PublicDownloadUrlProvider;
@@ -26,7 +27,7 @@ class ModuleUtilsTest extends AbstractMockedGithubClientTestCase
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),
             $this->createMock(HttpClientInterface::class),
-            $this->createGithubClientMock(),
+            $this->createGithubClientMock(PrestaShop::DISTRIBUTION_OPEN_SOURCE),
             $this->createMock(Bucket::class),
             new PublicDownloadUrlProvider(''),
             'PrestaShop/native-modules',

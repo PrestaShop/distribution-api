@@ -19,18 +19,21 @@ class CleanCommand extends Command
 
     private Filesystem $filesystem;
     private string $moduleDir;
-    private string $prestaShopDir;
+    private string $prestaShopOpenSourceDir;
+    private string $prestaShopClassicDir;
     private string $jsonDir;
 
     public function __construct(
         string $moduleDir,
-        string $prestaShopDir,
+        string $prestaShopOpenSourceDir,
+        string $prestaShopClassicDir,
         string $jsonDir,
     ) {
         parent::__construct();
         $this->filesystem = new Filesystem();
         $this->moduleDir = $moduleDir;
-        $this->prestaShopDir = $prestaShopDir;
+        $this->prestaShopOpenSourceDir = $prestaShopOpenSourceDir;
+        $this->prestaShopClassicDir = $prestaShopClassicDir;
         $this->jsonDir = $jsonDir;
     }
 
@@ -78,7 +81,12 @@ class CleanCommand extends Command
     private function cleanJson(OutputInterface $output): void
     {
         if (is_dir($this->jsonDir)) {
-            $this->filesystem->remove((new Finder())->in($this->jsonDir));
+            $finder = (new Finder())
+                ->in($this->jsonDir)
+                ->files()
+                ->notName('autoupgrade.json');
+
+            $this->filesystem->remove($finder);
         }
         $output->writeln('<info>Json folder cleaned</info>');
     }
@@ -93,9 +101,12 @@ class CleanCommand extends Command
 
     private function cleanPrestaShop(OutputInterface $output): void
     {
-        if (is_dir($this->prestaShopDir)) {
-            $this->filesystem->remove((new Finder())->in($this->prestaShopDir));
+        if (is_dir($this->prestaShopOpenSourceDir)) {
+            $this->filesystem->remove((new Finder())->in($this->prestaShopOpenSourceDir));
         }
-        $output->writeln('<info>PrestaShop folder cleaned</info>');
+        if (is_dir($this->prestaShopClassicDir)) {
+            $this->filesystem->remove((new Finder())->in($this->prestaShopClassicDir));
+        }
+        $output->writeln('<info>PrestaShop folders cleaned</info>');
     }
 }

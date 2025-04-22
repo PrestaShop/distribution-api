@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Command;
 
 use App\Command\UpdateModuleConfigFilesCommand;
+use App\Model\PrestaShop;
 use App\Util\ModuleUtils;
 use App\Util\PublicDownloadUrlProvider;
 use Github\Api\Repository\Contents;
@@ -28,7 +29,7 @@ class UpdateModuleConfigFilesCommandTest extends AbstractCommandTestCase
     {
         parent::setUp();
 
-        $this->githubClient = $this->createGithubClientMock();
+        $this->githubClient = $this->createGithubClientMock(PrestaShop::DISTRIBUTION_OPEN_SOURCE);
 
         $moduleUtils = new ModuleUtils(
             new ModuleParser(),

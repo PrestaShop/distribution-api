@@ -16,18 +16,28 @@ class CheckReposCommand extends Command
     protected static $defaultName = 'checkRepos';
 
     private ModuleUtils $moduleUtils;
-    private PrestaShopUtils $prestaShopUtils;
+    private PrestaShopUtils $prestaShopOpenSourceUtils;
+    private PrestaShopUtils $prestaShopClassicUtils;
 
-    public function __construct(ModuleUtils $moduleUtils, PrestaShopUtils $prestaShopUtils)
-    {
+    public function __construct(
+        ModuleUtils $moduleUtils,
+        PrestaShopUtils $prestaShopOpenSourceUtils,
+        PrestaShopUtils $prestaShopClassicUtils,
+    ) {
         parent::__construct();
         $this->moduleUtils = $moduleUtils;
-        $this->prestaShopUtils = $prestaShopUtils;
+        $this->prestaShopOpenSourceUtils = $prestaShopOpenSourceUtils;
+        $this->prestaShopClassicUtils = $prestaShopClassicUtils;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $prestashops = $this->prestaShopUtils->getVersions();
+        $prestashops = $this->prestaShopOpenSourceUtils->getVersions();
+        foreach ($prestashops as $prestashop) {
+            $this->checkPrestaShop($prestashop, $output);
+        }
+
+        $prestashops = $this->prestaShopClassicUtils->getVersions();
         foreach ($prestashops as $prestashop) {
             $this->checkPrestaShop($prestashop, $output);
         }
@@ -42,7 +52,7 @@ class CheckReposCommand extends Command
 
     private function checkPrestaShop(PrestaShop $prestaShop, OutputInterface $output): void
     {
-        $output->writeln(sprintf('<info>Checking PrestaShop %s</info>', $prestaShop->getVersion()));
+        $output->writeln(sprintf('<info>Checking PrestaShop %s for %s distribution</info>', $prestaShop->getCompleteVersion(), $prestaShop->getDistribution()));
         $releaseOk = true;
         if ($prestaShop->getGithubZipUrl() === null) {
             $output->writeln('<error>No Zip asset</error>');

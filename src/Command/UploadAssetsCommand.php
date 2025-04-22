@@ -14,42 +14,51 @@ class UploadAssetsCommand extends Command
 {
     protected static $defaultName = 'uploadAssets';
 
-    private const PRESTASHOP_ASSETS_PREFIX = 'assets/prestashop/';
+    private const PRESTASHOP_OPEN_SOURCE_ASSETS_PREFIX = 'assets/prestashop/';
+    private const PRESTASHOP_CLASSIC_ASSETS_PREFIX = 'assets/prestashop-classic/';
     private const MODULE_ASSETS_PREFIX = 'assets/modules/';
 
     private Bucket $bucket;
 
     private string $jsonDir;
-    private string $prestaShopDir;
+    private string $prestaShopOpenSourceDir;
+    private string $prestaShopClassicDir;
     private string $moduleDir;
 
-    public function __construct(Bucket $bucket, string $jsonDir, string $prestaShopDir, string $moduleDir)
-    {
+    public function __construct(
+        Bucket $bucket,
+        string $jsonDir,
+        string $prestaShopOpenSourceDir,
+        string $prestaShopClassicDir,
+        string $moduleDir,
+    ) {
         parent::__construct();
         $this->bucket = $bucket;
         $this->jsonDir = $jsonDir;
-        $this->prestaShopDir = $prestaShopDir;
+        $this->prestaShopOpenSourceDir = $prestaShopOpenSourceDir;
+        $this->prestaShopClassicDir = $prestaShopClassicDir;
         $this->moduleDir = $moduleDir;
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->uploadPrestaShop($output);
+        $this->uploadPrestaShop($output, $this->prestaShopOpenSourceDir, self::PRESTASHOP_OPEN_SOURCE_ASSETS_PREFIX);
+        $this->uploadPrestaShop($output, $this->prestaShopClassicDir, self::PRESTASHOP_CLASSIC_ASSETS_PREFIX);
         $this->uploadModules($output);
         $this->uploadJson($output);
 
         return self::SUCCESS;
     }
 
-    private function uploadPrestaShop(OutputInterface $output): void
+    private function uploadPrestaShop(OutputInterface $output, string $directory, string $assetsPrefix): void
     {
-        if (!file_exists($this->prestaShopDir)) {
+        if (!file_exists($directory)) {
             return;
         }
 
         $finder = new Finder();
         $finder->sortByName();
-        $prestashopZips = $finder->in($this->prestaShopDir)->files()->name(['prestashop.zip', 'prestashop.xml']);
+        $prestashopZips = $finder->in($directory)->files()->name(['prestashop.zip', 'prestashop.xml']);
 
         $output->writeln(sprintf('<info>%s new PrestaShop xml/archive(s) to upload.</info>', $prestashopZips->count()));
         if ($prestashopZips->count() === 0) {
@@ -60,7 +69,7 @@ class UploadAssetsCommand extends Command
         }
 
         foreach ($prestashopZips as $prestashopZip) {
-            $filename = self::PRESTASHOP_ASSETS_PREFIX . substr($prestashopZip->getPathname(), strlen($this->prestaShopDir) + 1);
+            $filename = $assetsPrefix . substr($prestashopZip->getPathname(), strlen($directory) + 1);
             $output->writeln(sprintf('<info>Upload file %s</info>', $filename));
             $this->bucket->upload(fopen($prestashopZip->getPathname(), 'r') ?: null, ['name' => $filename]);
         }

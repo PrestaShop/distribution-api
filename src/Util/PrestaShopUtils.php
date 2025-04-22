@@ -21,16 +21,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 use ZipArchive;
 
-class PrestaShopUtils
+abstract class PrestaShopUtils
 {
-    private GithubClient $githubClient;
     private HttpClientInterface $client;
-    private Bucket $bucket;
+    protected GithubClient $githubClient;
+    protected string $repositoryFullName;
+    protected string $prestaShopDir;
+    protected string $prestaShopMinVersion;
     private PublicDownloadUrlProvider $publicDownloadUrlProvider;
+    private Bucket $bucket;
     private ReleaseNoteUtils $releaseNoteUtils;
-    private string $prestaShopDir;
-    private string $prestaShopMinVersion;
-
     /**
      * @var array<string, array{php_min_version: string, php_max_version: string}>|null
      */
@@ -42,6 +42,7 @@ class PrestaShopUtils
         Bucket $bucket,
         PublicDownloadUrlProvider $publicDownloadUrlProvider,
         ReleaseNoteUtils $releaseNoteUtils,
+        string $repositoryFullName,
         string $prestaShopMinVersion,
         string $prestaShopDir,
     ) {
@@ -50,8 +51,63 @@ class PrestaShopUtils
         $this->bucket = $bucket;
         $this->publicDownloadUrlProvider = $publicDownloadUrlProvider;
         $this->releaseNoteUtils = $releaseNoteUtils;
+        $this->repositoryFullName = $repositoryFullName;
         $this->prestaShopMinVersion = $prestaShopMinVersion;
         $this->prestaShopDir = $prestaShopDir;
+    }
+
+    /**
+     * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
+     */
+    abstract protected function buildModelFromRepository(mixed $item): PrestaShop;
+
+    /**
+     * @return PrestaShop[]
+     */
+    public function getVersions(): array
+    {
+        $page = 1;
+        $versions = [];
+        $releasesApi = $this->githubClient->repo()->releases();
+        [$owner, $repo] = explode('/', $this->repositoryFullName, 2);
+        while (count($results = $releasesApi->all($owner, $repo, ['page' => $page++])) > 0) {
+            $versions = array_merge($versions, array_filter(
+                $results,
+                fn ($item) => $this->hasZipAsset($item) && $this->isVersionGreaterThanOrEqualToMin($item['tag_name'])
+            ));
+        }
+
+        return array_map(fn ($item) => $this->buildModelFromRepository($item), $versions);
+    }
+
+    /**
+     * @return PrestaShop[]
+     */
+    public function getLocalVersions(): array
+    {
+        $versions = [];
+        $exclude = ['.', '..'];
+        if (!is_dir($this->prestaShopDir) || !$prestaShopScandir = scandir($this->prestaShopDir)) {
+            return [];
+        }
+        foreach ($prestaShopScandir as $prestaShopVersion) {
+            if (in_array($prestaShopVersion, $exclude) || !is_dir($this->prestaShopDir . '/' . $prestaShopVersion)) {
+                continue;
+            }
+            $versionPath = $this->prestaShopDir . '/' . $prestaShopVersion;
+            if (!is_file($versionPath . '/prestashop.zip')) {
+                continue;
+            }
+
+            $completeVersion = VersionUtils::parseVersion($prestaShopVersion);
+            $distributionVersion = $completeVersion['distribution'];
+            $distribution = $distributionVersion ? PrestaShop::DISTRIBUTION_CLASSIC : PrestaShop::DISTRIBUTION_OPEN_SOURCE;
+            $prestashopVersion = $completeVersion['base'] . ($completeVersion['stability'] ? '-' . $completeVersion['stability'] : '');
+
+            $versions[] = $this->buildModelFromLocal($prestashopVersion, $distribution, $versionPath, $distributionVersion);
+        }
+
+        return $versions;
     }
 
     /**
@@ -59,7 +115,9 @@ class PrestaShopUtils
      */
     public function download(PrestaShop $prestaShop): void
     {
-        $path = $this->prestaShopDir . '/' . $prestaShop->getVersion();
+        $versionPath = $prestaShop->getCompleteVersion();
+
+        $path = $this->prestaShopDir . '/' . $versionPath;
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
         }
@@ -80,36 +138,9 @@ class PrestaShopUtils
     }
 
     /**
-     * @return PrestaShop[]
-     */
-    public function getVersions(): array
-    {
-        $page = 1;
-        $versions = [];
-        $releasesApi = $this->githubClient->repo()->releases();
-        while (count($results = $releasesApi->all('PrestaShop', 'PrestaShop', ['page' => $page++])) > 0) {
-            $versions = array_merge($versions, array_filter(
-                $results,
-                fn ($item) => $this->hasZipAsset($item) && $this->isVersionGreaterThanOrEqualToMin($item['tag_name'])
-            ));
-        }
-
-        return array_map(function ($item): PrestaShop {
-            $prestaShop = new PrestaShop($item['tag_name']);
-            $prestaShop->setGithubZipUrl($this->getZipAssetUrl($item));
-            try {
-                $prestaShop->setGithubXmlUrl($this->getXmlAssetUrl($item));
-            } catch (NoAssetException) {
-            }
-
-            return $prestaShop;
-        }, $versions);
-    }
-
-    /**
      * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
      */
-    private function hasZipAsset(array $item): bool
+    protected function hasZipAsset(array $item): bool
     {
         try {
             $this->getZipAssetUrl($item);
@@ -123,7 +154,7 @@ class PrestaShopUtils
     /**
      * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
      */
-    private function getZipAssetUrl(array $item): string
+    protected function getZipAssetUrl(array $item): string
     {
         $zipName = $this->getZipName($item);
         foreach ($item['assets'] as $asset) {
@@ -138,7 +169,7 @@ class PrestaShopUtils
     /**
      * @param array{'tag_name': string, 'assets': array<array{'name': string, 'browser_download_url': string}>} $item
      */
-    private function getXmlAssetUrl(array $item): string
+    protected function getXmlAssetUrl(array $item): string
     {
         $zipName = $this->getXmlName($item);
         foreach ($item['assets'] as $asset) {
@@ -186,49 +217,35 @@ class PrestaShopUtils
             if (empty($prestaShopJson['xml_download_url']) || empty($prestaShopJson['zip_md5'])) {
                 continue;
             }
-            $prestashop = new PrestaShop($prestaShopJson['version']);
+            $prestashop = new PrestaShop(
+                $prestaShopJson['version'],
+                $prestaShopJson['distribution'],
+                $prestaShopJson['distribution_version'],
+            );
             $prestashop->setMaxPhpVersion($prestaShopJson['php_max_version']);
             $prestashop->setMinPhpVersion($prestaShopJson['php_min_version']);
             $prestashop->setZipMD5($prestaShopJson['zip_md5']);
-            $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopJson['version']));
-            $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopJson['version']));
-            $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestaShopJson['version']));
+            $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestashop->getCompleteVersion(), $prestashop->getDistribution()));
+            $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestashop->getCompleteVersion(), $prestashop->getDistribution()));
+            $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestashop->getCompleteVersion()));
             $prestaShops[] = $prestashop;
         }
 
         return $prestaShops;
     }
 
-    /**
-     * @return PrestaShop[]
-     */
-    public function getLocalVersions(): array
+    protected function buildModelFromLocal(string $prestaShopVersion, string $distribution, string $versionPath, ?string $distributionVersion): PrestaShop
     {
-        $versions = [];
-        $exclude = ['.', '..'];
-        if (!is_dir($this->prestaShopDir) || !$prestaShopScandir = scandir($this->prestaShopDir)) {
-            return [];
-        }
-        foreach ($prestaShopScandir as $prestaShopVersion) {
-            if (in_array($prestaShopVersion, $exclude) || !is_dir($this->prestaShopDir . '/' . $prestaShopVersion)) {
-                continue;
-            }
-            $versionPath = $this->prestaShopDir . '/' . $prestaShopVersion;
-            if (!is_file($versionPath . '/prestashop.zip')) {
-                continue;
-            }
-            $prestashop = new PrestaShop($prestaShopVersion);
-            $this->setVersionsCompat($prestashop);
-            $prestashop->setZipMD5(md5_file($versionPath . '/prestashop.zip') ?: null);
-            $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestaShopVersion));
-            $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestaShopVersion));
-            if (is_file($versionPath . '/prestashop.xml')) {
-                $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestaShopVersion));
-            }
-            $versions[] = $prestashop;
+        $prestashop = new PrestaShop($prestaShopVersion, $distribution, $distributionVersion);
+        $this->setVersionsCompat($prestashop);
+        $prestashop->setZipMD5(md5_file($versionPath . '/prestashop.zip') ?: null);
+        $prestashop->setZipDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopZipDownloadUrl($prestashop->getCompleteVersion(), $prestashop->getDistribution()));
+        $prestashop->setReleaseNoteUrl($this->releaseNoteUtils->getReleaseNote($prestashop->getCompleteVersion()));
+        if (is_file($versionPath . '/prestashop.xml')) {
+            $prestashop->setXmlDownloadUrl($this->publicDownloadUrlProvider->getPrestaShopXmlDownloadUrl($prestashop->getCompleteVersion(), $prestashop->getDistribution()));
         }
 
-        return $versions;
+        return $prestashop;
     }
 
     private function setVersionsCompat(PrestaShop $prestaShop): void
@@ -241,17 +258,18 @@ class PrestaShopUtils
             return;
         }
 
+        $version = $prestaShop->getCompleteVersion();
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $installZip = new ZipArchive();
-        $installZip->open($this->prestaShopDir . '/' . $prestaShop->getVersion() . '/prestashop.zip');
-        $installZip->extractTo($this->prestaShopDir . '/' . $prestaShop->getVersion() . '/prestashop/');
+        $installZip->open($this->prestaShopDir . '/' . $version . '/prestashop.zip');
+        $installZip->extractTo($this->prestaShopDir . '/' . $version . '/prestashop/');
         $installZip->close();
 
-        $installZip->open($this->prestaShopDir . '/' . $prestaShop->getVersion() . '/prestashop/prestashop.zip');
+        $installZip->open($this->prestaShopDir . '/' . $version . '/prestashop/prestashop.zip');
         $content = $installZip->getFromName('install/install_version.php');
         $installZip->close();
 
-        (new Filesystem())->remove($this->prestaShopDir . '/' . $prestaShop->getVersion() . '/prestashop');
+        (new Filesystem())->remove($this->prestaShopDir . '/' . $version . '/prestashop');
 
         if (!$content) {
             return;
@@ -308,11 +326,6 @@ class PrestaShopUtils
         return $this->prestashop17PhpCompatData[$semverVersion] ?? ['php_min_version' => null, 'php_max_version' => null];
     }
 
-    private function isVersionGreaterThanOrEqualToMin(string $version): bool
-    {
-        return version_compare($version, $this->prestaShopMinVersion, '>=');
-    }
-
     private function nodeHasDefine(Stmt $node, string $define): bool
     {
         if (
@@ -340,5 +353,10 @@ class PrestaShopUtils
         }
 
         return (string) $node->expr->getArgs()[1]->value->value;
+    }
+
+    private function isVersionGreaterThanOrEqualToMin(string $version): bool
+    {
+        return version_compare($version, $this->prestaShopMinVersion, '>=');
     }
 }
