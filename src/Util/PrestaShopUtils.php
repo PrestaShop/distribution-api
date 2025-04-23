@@ -130,6 +130,12 @@ abstract class PrestaShopUtils
         $response = $this->client->request('GET', $prestaShop->getGithubZipUrl());
         file_put_contents($path . '/prestashop.zip', $response->toStream());
 
+        // Extract immediately the Zip inside the Zip
+        $fp = fopen('zip://' . $path . '/prestashop.zip#prestashop.zip', 'r');
+        file_put_contents($path . '/prestashop2.zip', $fp);
+        fclose($fp);
+        (new Filesystem())->rename($path . '/prestashop2.zip', $path . '/prestashop.zip', true);
+
         if ($prestaShop->getGithubXmlUrl() !== null) {
             /** @var StreamableInterface $response */
             $response = $this->client->request('GET', $prestaShop->getGithubXmlUrl());
@@ -262,14 +268,8 @@ abstract class PrestaShopUtils
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
         $installZip = new ZipArchive();
         $installZip->open($this->prestaShopDir . '/' . $version . '/prestashop.zip');
-        $installZip->extractTo($this->prestaShopDir . '/' . $version . '/prestashop/');
-        $installZip->close();
-
-        $installZip->open($this->prestaShopDir . '/' . $version . '/prestashop/prestashop.zip');
         $content = $installZip->getFromName('install/install_version.php');
         $installZip->close();
-
-        (new Filesystem())->remove($this->prestaShopDir . '/' . $version . '/prestashop');
 
         if (!$content) {
             return;
