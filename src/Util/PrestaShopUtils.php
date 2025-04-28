@@ -250,7 +250,7 @@ abstract class PrestaShopUtils
 
     private function setVersionsCompat(PrestaShop $prestaShop): void
     {
-        if (version_compare($prestaShop->getVersion(), '8.0.0', '<')) {
+        if (version_compare($prestaShop->getVersion(), '8', '<')) {
             $versionCompat = $this->getPhpVersionCompatFromJson($prestaShop->getVersion());
             $prestaShop->setMinPhpVersion($versionCompat['php_min_version']);
             $prestaShop->setMaxPhpVersion($versionCompat['php_max_version']);
