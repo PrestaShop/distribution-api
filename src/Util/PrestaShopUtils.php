@@ -214,7 +214,7 @@ abstract class PrestaShopUtils
             if (!$this->isVersionGreaterThanOrEqualToMin($prestaShopJson['version'])) {
                 continue;
             }
-            if (empty($prestaShopJson['xml_download_url']) || empty($prestaShopJson['zip_md5'])) {
+            if (empty($prestaShopJson['xml_download_url']) || empty($prestaShopJson['zip_md5']) || empty($prestaShopJson['distribution'])) {
                 continue;
             }
             $prestashop = new PrestaShop(
