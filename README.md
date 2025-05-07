@@ -94,6 +94,9 @@ Returns every PrestaShop versions
 Returns the latest version of the specified channel<br>
 `<channel>` can be: `stable`, `rc` or `beta`
 
+`http://<domain.to.public.folder>/autoupgrade`<br>
+Returns the PrestaShop version ranges supported by [Update Assistant](https://github.com/PrestaShop/autoupgrade) (`autoupgrade` module) versions
+
 ### Environments
 
 There are 3 targeted environment at the moment:
