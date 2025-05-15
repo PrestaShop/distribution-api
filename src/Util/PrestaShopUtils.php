@@ -215,6 +215,11 @@ abstract class PrestaShopUtils
                 continue;
             }
             if (empty($prestaShopJson['xml_download_url']) || empty($prestaShopJson['zip_md5']) || empty($prestaShopJson['distribution'])) {
+                // Refresh the details if a version was added from an old version of the API
+                continue;
+            }
+            if (empty($prestaShopJson['release_notes_url']) && $prestaShopJson['stability'] === 'stable') {
+                // Refresh the details if a stable version lacks its release notes.
                 continue;
             }
             $prestashop = new PrestaShop(
