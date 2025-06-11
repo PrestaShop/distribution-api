@@ -2,14 +2,14 @@
   "prestashop": [
     {
       "prestashop_min": "1.7.0.0",
-      "prestashop_max": "8.2.1",
+      "prestashop_max": "9.0.0",
       "autoupgrade_recommended": {
-        "last_version": "7.0.0",
+        "last_version": "7.1.0",
         "download": {
-          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v7.0.0/autoupgrade-v7.0.0.zip",
-          "md5": "c0d83aea9dbb03d7f2f698d011144d43"
+          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v7.1.0/autoupgrade-v7.1.0.zip",
+          "md5": "974024b034c55773ee2df93e18fded42"
         },
-        "changelog": "https://build.prestashop-project.org/news/2025/autoupgrade-v7.0-release/"
+        "changelog": "https://github.com/PrestaShop/autoupgrade/releases/tag/v7.1.0"
       }
     },
     {
