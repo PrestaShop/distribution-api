@@ -4,7 +4,7 @@
   "distribution_version": "0.2",
   "php_max_version": "8.4",
   "php_min_version": "8.1",
-  "release_notes_url": null,
+  "release_notes_url": "https://build.prestashop-project.org/news/2025/prestashop-9-0-available/",
   "stability": "stable",
   "xml_download_url": "\/assets\/prestashop-classic\/9.0.0-0.2\/prestashop.xml",
   "zip_download_url": "\/assets\/prestashop-classic\/9.0.0-0.2\/prestashop.zip",

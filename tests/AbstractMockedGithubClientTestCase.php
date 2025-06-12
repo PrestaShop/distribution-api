@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractMockedGithubClientTestCase extends TestCase
 {
-    protected function createGithubClientMock(string $ditribution): Client
+    protected function createGithubClientMock(string $distribution): Client
     {
         $content = $this->createMock(Contents::class);
         $content->method('show')->willReturnCallback(function ($username, $repo, $filename): array {
@@ -24,7 +24,7 @@ abstract class AbstractMockedGithubClientTestCase extends TestCase
         });
 
         $release = $this->createMock(Releases::class);
-        $fileName = $ditribution === PrestaShop::DISTRIBUTION_OPEN_SOURCE ? 'prestashop' : 'prestashop-classic';
+        $fileName = $distribution === PrestaShop::DISTRIBUTION_OPEN_SOURCE ? 'prestashop' : 'prestashop-classic';
         $release->method('all')->willReturnOnConsecutiveCalls(json_decode(file_get_contents(__DIR__ . '/ressources/stubs/' . $fileName . '.json'), true), [], []);
 
         $repo = $this->createMock(Repo::class);
