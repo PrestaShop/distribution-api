@@ -58,11 +58,11 @@ class DownloadNewPrestaShopReleasesCommand extends Command
     {
         $prestaShopVersions = [];
         $alreadyAvailablePrestaShopVersions = array_map(
-            fn ($item) => $item->getVersion(), $prestaShopUtils->getVersionsFromBucket()
+            fn ($item) => $item->getCompleteVersion(), $prestaShopUtils->getVersionsFromBucket()
         );
 
         foreach ($prestaShop as $ps) {
-            if (!in_array($ps->getVersion(), $alreadyAvailablePrestaShopVersions)) {
+            if (!in_array($ps->getCompleteVersion(), $alreadyAvailablePrestaShopVersions)) {
                 $prestaShopVersions[] = $ps;
             }
         }
