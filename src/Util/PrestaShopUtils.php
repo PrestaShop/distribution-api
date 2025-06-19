@@ -211,9 +211,6 @@ abstract class PrestaShopUtils
         $prestaShops = [];
 
         foreach ($prestaShopsJson as $prestaShopJson) {
-            if (!$this->isVersionGreaterThanOrEqualToMin($prestaShopJson['version'])) {
-                continue;
-            }
             if (empty($prestaShopJson['xml_download_url']) || empty($prestaShopJson['zip_md5']) || empty($prestaShopJson['distribution'])) {
                 // Refresh the details if a version was added from an old version of the API
                 continue;
@@ -222,11 +219,17 @@ abstract class PrestaShopUtils
                 // Refresh the details if a stable version lacks its release notes.
                 continue;
             }
+
             $prestashop = new PrestaShop(
                 $prestaShopJson['version'],
                 $prestaShopJson['distribution'],
                 $prestaShopJson['distribution_version'],
             );
+
+            if (!$this->isVersionGreaterThanOrEqualToMin($prestashop->getCompleteVersion())) {
+                continue;
+            }
+
             $prestashop->setMaxPhpVersion($prestaShopJson['php_max_version']);
             $prestashop->setMinPhpVersion($prestaShopJson['php_min_version']);
             $prestashop->setZipMD5($prestaShopJson['zip_md5']);
