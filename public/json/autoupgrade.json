@@ -3,6 +3,7 @@
     {
       "prestashop_min": "1.7.0.0",
       "prestashop_max": "8.2.3",
+      "recommended": true,
       "autoupgrade_recommended": {
         "last_version": "7.3.0",
         "download": {
@@ -14,6 +15,7 @@
     {
       "prestashop_min": "9.0.0",
       "prestashop_max": "9.0.0",
+      "recommended": false,
       "autoupgrade_recommended": {
         "last_version": "7.3.0",
         "download": {
@@ -25,6 +27,7 @@
     {
       "prestashop_min": "1.6.0.0",
       "prestashop_max": "1.7.8.11",
+      "recommended": true,
       "autoupgrade_recommended": {
         "last_version": "4.16.4",
         "download": {
