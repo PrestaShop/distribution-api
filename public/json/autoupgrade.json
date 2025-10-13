@@ -29,10 +29,10 @@
       "prestashop_max": "1.7.8.11",
       "recommended": true,
       "autoupgrade_recommended": {
-        "last_version": "4.16.4",
+        "last_version": "4.14.4",
         "download": {
-          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v4.16.4/autoupgrade.zip",
-          "md5": "3639dd7c9910f2805777cbcae129ef1a"
+          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v4.14.4/autoupgrade-v4.14.4.zip",
+          "md5": "76cc875318c82bb2fb3b1650d574f822"
         }
       }
     }
