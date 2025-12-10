@@ -14,13 +14,13 @@
     },
     {
       "prestashop_min": "9.0.0",
-      "prestashop_max": "9.0.1",
+      "prestashop_max": "9.0.2",
       "recommended": false,
       "autoupgrade_recommended": {
-        "last_version": "7.4.1",
+        "last_version": "7.4.4",
         "download": {
-          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v7.4.1/autoupgrade-v7.4.1.zip",
-          "md5": "28a29a7e50bb3bbedc79789b5df5656a"
+          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v7.4.4/autoupgrade-v7.4.4.zip",
+          "md5": "4bb2d99c627857f8d58d382172cfc9b7"
         }
       }
     },
