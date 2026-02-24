@@ -112,7 +112,7 @@ class GenerateJsonCommand extends Command
     ): void {
         $infos = [];
 
-        $prestashopVersions = $this->addVersionsUnderDelopment($prestashopVersions);
+        $prestashopVersions = $this->addVersionsUnderDevelopment($prestashopVersions);
         foreach ($prestashopVersions as $prestashopVersion) {
             $infos[$prestashopVersion->getVersion()] = [];
             foreach ($modules as $module) {
@@ -160,7 +160,7 @@ class GenerateJsonCommand extends Command
      *
      * @return PrestaShop[]
      */
-    public function addVersionsUnderDelopment(array $prestashopVersions): array
+    public function addVersionsUnderDevelopment(array $prestashopVersions): array
     {
         if (empty($prestashopVersions)) {
             return $prestashopVersions;
@@ -171,6 +171,10 @@ class GenerateJsonCommand extends Command
         $developmentVersions = [];
 
         // Add next major, minor and patches for the current highest version
+        // Example if highest stable version is 9.0.3, it will add:
+        //   - 9.0.4
+        //   - 9.1.0
+        //   - 10.0.0
         $highestVersion = $versionUtils->getHighestStableVersionFromList($prestashopVersions);
         if (!empty($highestVersion)) {
             $developmentVersions[] = $highestVersion->getNextMajorVersion();
@@ -178,11 +182,26 @@ class GenerateJsonCommand extends Command
             $developmentVersions[] = $highestVersion->getNextPatchVersion();
         }
 
-        // Let's also add possible patches for previous major
+        // Let's also add possible patches for previous major (because we usually maintain two major versions)
+        // Example if highest stable version is 9.0.3, and highest previous stable version is 8.2.4, then it will add:
+        //   - 8.2.5
+        //   - 8.3.0
+        //   - 9.0.0
         $highestPreviousVersion = $versionUtils->getHighestStablePreviousVersionFromList($prestashopVersions);
         if (!empty($highestPreviousVersion)) {
             $developmentVersions[] = $highestPreviousVersion->getNextMinorVersion();
             $developmentVersions[] = $highestPreviousVersion->getNextPatchVersion();
+        }
+
+        // When one version is reaching its release, we release several beta and rc versions We need to anticipate
+        // the coming version that starts being developed on develop branch Either next minor or next major
+        // Example if highest development version is 9.1.0-beta.1, then it will add:
+        //   - 9.2.0
+        //   - 10.0.0
+        $highestDevelopmentVersion = $versionUtils->getHighestVersionUnderDevelopmentFromList($prestashopVersions);
+        if (!empty($highestDevelopmentVersion)) {
+            $developmentVersions[] = $highestDevelopmentVersion->getNextMinorVersion();
+            $developmentVersions[] = $highestDevelopmentVersion->getNextMajorVersion();
         }
 
         // Remove all development versions that are older than the min version

@@ -72,6 +72,92 @@ class VersionUtilsTest extends AbstractMockedGithubClientTestCase
     }
 
     /**
+     * @dataProvider getDevelopmentVersions
+     */
+    public function testGetHighestVersionUnderDevelopmentFromList(array $versionsList, ?string $expectedVersion): void
+    {
+        $prestashopVersions = array_map(static function (string $version): PrestaShop {
+            return new PrestaShop($version);
+        }, $versionsList);
+        $developmentVersion = (new VersionUtils())->getHighestVersionUnderDevelopmentFromList($prestashopVersions);
+        if (null === $expectedVersion) {
+            $this->assertNull($developmentVersion);
+        } else {
+            $this->assertNotNull($developmentVersion);
+            $this->assertEquals($expectedVersion, $developmentVersion->getVersion());
+        }
+    }
+
+    public static function getDevelopmentVersions(): iterable
+    {
+        yield 'no beta versions, no development version' => [
+            [
+                '8.1.4',
+                '8.1.3',
+                '9.0.0',
+            ],
+            null,
+        ];
+
+        yield 'beta version but actual version already released, no development version' => [
+            [
+                '8.1.4',
+                '8.1.3',
+                '9.0.0-beta',
+                '9.0.0',
+            ],
+            null,
+        ];
+
+        yield 'beta version without stable version released, one development version returned' => [
+            [
+                '8.1.4',
+                '8.1.3',
+                '9.0.0-beta',
+                '9.0.0',
+                '9.1.0-beta',
+            ],
+            '9.1.0-beta',
+        ];
+
+        yield 'beta and rc versions without stable version released, rc version returned' => [
+            [
+                '8.1.4',
+                '8.1.3',
+                '9.0.0-beta',
+                '9.0.0',
+                '9.1.0-rc',
+                '9.1.0-beta',
+            ],
+            '9.1.0-rc',
+        ];
+
+        yield 'two versions without stable version released, higher beta version returned' => [
+            [
+                '8.1.4',
+                '9.1.0-beta.2',
+                '8.1.3',
+                '9.0.0-beta',
+                '9.0.0',
+                '9.1.0-beta.1',
+            ],
+            '9.1.0-beta.2',
+        ];
+
+        yield 'two dev versions without stable version released, higher version returned' => [
+            [
+                '8.1.4',
+                '9.1.0-beta.2',
+                '8.1.3',
+                '9.0.0-beta',
+                '9.0.0',
+                '9.2.0-beta.1',
+            ],
+            '9.2.0-beta.1',
+        ];
+    }
+
+    /**
      * @dataProvider versionProvider
      */
     public function testFormatVersionToSemver(string $input, string $expected): void
