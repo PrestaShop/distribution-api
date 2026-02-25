@@ -27,6 +27,11 @@ $ ./bin/console downloadNativeModuleFiles
 This will download the main file of the module so the app can extract the module's version and the PrestaShop versions compliance.
 It will also download the zip release of the module if it isn't already in the GCP bucket, so it can be added later by the command `uploadAssets`
 
+If you run this command locally for dev purposes and you don't want to plug on the bucket (or don't have the credentials) you can ignore the error with the extra option:
+```shell
+$ ./bin/console downloadNativeModuleFiles --ignore-bucket-failure
+```
+
 #### Download PrestaShop's releases
 ```shell
 $ ./bin/console downloadNewPrestaShopReleases

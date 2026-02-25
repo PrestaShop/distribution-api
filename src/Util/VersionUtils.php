@@ -36,6 +36,62 @@ class VersionUtils
     }
 
     /**
+     * Returns highest available version under development from a list of Prestashop versions.
+     * Should only return beta or rc versions.
+     *
+     * @param PrestaShop[] $list
+     *
+     * @return PrestaShop|null
+     */
+    public function getHighestVersionUnderDevelopmentFromList(array $list = []): ?PrestaShop
+    {
+        if (empty($list)) {
+            return null;
+        }
+
+        // First get only versions under development
+        $versionsUnderDevelopment = [];
+        $stableVersions = [];
+        foreach ($list as $version) {
+            if (!$version->isStable()) {
+                $versionsUnderDevelopment[] = $version;
+            } else {
+                $stableVersions[] = $version;
+            }
+        }
+
+        if (empty($versionsUnderDevelopment)) {
+            return null;
+        }
+
+        // Then remove the ones that have been released
+        foreach ($stableVersions as $stableVersion) {
+            foreach ($versionsUnderDevelopment as $key => $developmentVersion) {
+                if ($developmentVersion->getMajorVersionNumber() === $stableVersion->getMajorVersionNumber()
+                    && $developmentVersion->getMinorVersionNumber() === $stableVersion->getMinorVersionNumber()
+                    && $developmentVersion->getPatchVersionNumber() === $stableVersion->getPatchVersionNumber()) {
+                    unset($versionsUnderDevelopment[$key]);
+                    break;
+                }
+            }
+        }
+
+        if (empty($versionsUnderDevelopment)) {
+            return null;
+        }
+
+        // Get highest version available
+        $highestVersionUnderDevelopment = null;
+        foreach ($versionsUnderDevelopment as $developmentVersion) {
+            if ($highestVersionUnderDevelopment === null || version_compare($developmentVersion->getVersion(), $highestVersionUnderDevelopment->getVersion(), '>')) {
+                $highestVersionUnderDevelopment = $developmentVersion;
+            }
+        }
+
+        return $highestVersionUnderDevelopment;
+    }
+
+    /**
      * Returns highest available stable version of a previous major from a list of Prestashop versions.
      * Ignores beta and release candidates.
      *

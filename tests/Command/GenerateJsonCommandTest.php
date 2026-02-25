@@ -133,13 +133,12 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
      */
     public function testAddVersionsUnderDelopment(array $before, array $afterExpected)
     {
-        $this->assertEquals($afterExpected, $this->command->addVersionsUnderDelopment($before));
+        $this->assertEquals($afterExpected, $this->command->addVersionsUnderDevelopment($before));
     }
 
     public function versionListProvider(): iterable
     {
-        // Pretty normal scenario
-        yield [[
+        yield 'Pretty normal scenario' => [[
             new PrestaShop('8.1.4'),
             new PrestaShop('8.1.3'),
             new PrestaShop('9.0.0'),
@@ -157,8 +156,8 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             new PrestaShop('8.2.0'),
             new PrestaShop('8.1.5'),
         ]];
-        // Scenario to avoid adding 1.7 versions as a previous major
-        yield [[
+
+        yield 'Scenario to avoid adding 1.7 versions as a previous major' => [[
             new PrestaShop('8.1.4'),
             new PrestaShop('8.1.3'),
             new PrestaShop('1.7.8.10'),
@@ -170,8 +169,8 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             new PrestaShop('8.2.0'),
             new PrestaShop('8.1.5'),
         ]];
-        // Scenario to avoid considering beta as a stable channel
-        yield [[
+
+        yield 'Scenario to avoid considering beta as a stable channel, and anticipate future version under development' => [[
             new PrestaShop('8.1.4'),
             new PrestaShop('8.1.3'),
             new PrestaShop('9.0.0-beta'),
@@ -184,6 +183,8 @@ class GenerateJsonCommandTest extends AbstractCommandTestCase
             new PrestaShop('9.0.0'),
             new PrestaShop('8.2.0'),
             new PrestaShop('8.1.5'),
+            new PrestaShop('9.1.0'),
+            new PrestaShop('10.0.0'),
         ]];
     }
 }
