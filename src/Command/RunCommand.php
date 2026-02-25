@@ -40,9 +40,10 @@ class RunCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $cleanCommandInput = new ArrayInput(['directory' => 'all'], $this->cleanCommand->getDefinition());
+        $downloadNativeCommandInput = new ArrayInput([], $this->downloadNativeModuleFilesCommand->getDefinition());
         if (
             $this->cleanCommand->execute($cleanCommandInput, $output) === self::SUCCESS
-            && $this->downloadNativeModuleFilesCommand->execute($input, $output) === self::SUCCESS
+            && $this->downloadNativeModuleFilesCommand->execute($downloadNativeCommandInput, $output) === self::SUCCESS
             && $this->downloadNewPrestaShopReleasesCommand->execute($input, $output) === self::SUCCESS
             && $this->updateModuleConfigFilesCommand->execute($input, $output) === self::SUCCESS
             && $this->generateJsonCommand->execute($input, $output) === self::SUCCESS
