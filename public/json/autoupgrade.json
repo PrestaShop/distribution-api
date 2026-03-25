@@ -5,22 +5,22 @@
       "prestashop_max": "8.2.5",
       "recommended": true,
       "autoupgrade_recommended": {
-        "last_version": "7.5.1",
+        "last_version": "7.6.0",
         "download": {
-          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v7.5.1/autoupgrade-v7.5.1.zip",
-          "md5": "1872578ee8822c84571f4c3f557dd84d"
+          "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v7.6.0/autoupgrade-v7.6.0.zip",
+          "md5": "366e6ee52772324666082123fa90ed3b"
         }
       }
     },
     {
       "prestashop_min": "9.0.0",
-      "prestashop_max": "9.0.3",
+      "prestashop_max": "9.1.0",
       "recommended": false,
       "autoupgrade_recommended": {
         "last_version": "7.5.1",
         "download": {
           "link": "https://github.com/PrestaShop/autoupgrade/releases/download/v7.5.1/autoupgrade-v7.5.1.zip",
-          "md5": "1872578ee8822c84571f4c3f557dd84d"
+          "md5": "366e6ee52772324666082123fa90ed3b"
         }
       }
     },
