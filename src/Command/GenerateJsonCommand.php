@@ -282,7 +282,12 @@ class GenerateJsonCommand extends Command
                 break;
         }
 
-        return $isChannel && ($current === null || version_compare($new->getVersion(), $current->getVersion(), '>'));
+        return $isChannel && (
+            $current === null || (
+                version_compare($new->getVersion(), $current->getVersion(), '>=')
+                && version_compare($new->getDistributionVersion() ?? '0', $current->getDistributionVersion() ?? '0', '>=')
+            )
+        );
     }
 
     /**
@@ -299,8 +304,8 @@ class GenerateJsonCommand extends Command
         $filtered = [];
 
         foreach ($versions as $version) {
-            // Build a unique key using version number and stability (e.g. "9.0.0|beta")
-            $key = $version->getVersion() . '|' . $version->getStability();
+            // Build a unique key using version number, stability, and distribution version (e.g. "9.0.0|beta|2.0")
+            $key = $version->getVersion() . '|' . $version->getStability() . '|' . $version->getDistributionVersion();
 
             // If the key is not yet in the result, just store it
             if (!isset($filtered[$key])) {
@@ -315,6 +320,8 @@ class GenerateJsonCommand extends Command
         }
 
         // Re-index the array numerically
+        rsort($filtered);
+
         return array_values($filtered);
     }
 }

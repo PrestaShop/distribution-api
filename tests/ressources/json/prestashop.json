@@ -1,6 +1,30 @@
 [
   {
     "version": "9.0.0",
+    "distribution": "open_source",
+    "distribution_version": null,
+    "php_max_version": "8.4",
+    "php_min_version": "8.1",
+    "release_notes_url": "https://build.prestashop-project.org/news/2025/prestashop-9-0-available/",
+    "stability": "stable",
+    "xml_download_url": "\/assets\/prestashop\/9.0.0\/prestashop.xml",
+    "zip_download_url": "\/assets\/prestashop\/9.0.0\/prestashop.zip",
+    "zip_md5": "07f0a71a301e966447e3419143cdf570"
+  },
+  {
+    "version": "9.0.0",
+    "distribution": "classic",
+    "distribution_version": "3.0",
+    "php_max_version": "8.4",
+    "php_min_version": "8.1",
+    "release_notes_url": "https://build.prestashop-project.org/news/2025/prestashop-9-0-available/",
+    "stability": "stable",
+    "xml_download_url": "\/assets\/prestashop-classic\/9.0.0-3.0\/prestashop.xml",
+    "zip_download_url": "\/assets\/prestashop-classic\/9.0.0-3.0\/prestashop.zip",
+    "zip_md5": "07f0a71a301e966447e3419143cdf570"
+  },
+  {
+    "version": "9.0.0",
     "distribution": "classic",
     "distribution_version": "0.2",
     "php_max_version": "8.4",
