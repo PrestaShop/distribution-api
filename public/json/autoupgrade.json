@@ -2,7 +2,7 @@
   "prestashop": [
     {
       "prestashop_min": "1.7.0.0",
-      "prestashop_max": "8.2.5",
+      "prestashop_max": "8.2.6",
       "recommended": true,
       "autoupgrade_recommended": {
         "last_version": "7.6.3",
@@ -14,7 +14,7 @@
     },
     {
       "prestashop_min": "9.0.0",
-      "prestashop_max": "9.1.0",
+      "prestashop_max": "9.1.1",
       "recommended": false,
       "autoupgrade_recommended": {
         "last_version": "7.6.3",
