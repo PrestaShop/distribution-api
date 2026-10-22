@@ -4,7 +4,7 @@
     "description": "Generates PrestaShop Open-Source API endpoints",
     "license": "MIT",
     "require": {
-        "php": "^8.0",
+        "php": "^8.2",
         "ext-zip": "*",
         "prestashop/psssst": "^1.2",
         "symfony/config": "^5.3",
@@ -32,7 +32,7 @@
             "php-http/discovery": true
         },
         "platform": {
-            "php": "8.1"
+            "php": "8.2"
         }
     }
 }
